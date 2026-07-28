@@ -17,5 +17,5 @@ jobs:
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.GCP_SA_KEY }}'
-          projectId: vicky-leaps-1
+          projectId: github-deployer-503810
           channelId: live

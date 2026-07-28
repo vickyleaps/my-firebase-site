@@ -1,1 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>  Meow Meow Master Mind</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0e6d6; /* 米色背景 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        #game-board {
+            width: 800px;
+            height: 600px;
+            background-image: url('https://vickyleaps.com/images/mastermind/wood-texture.jpg'); /* 木紋背景 */
+            background-size: cover;
+            border: 10px solid #8b4513; /* 深棕色邊框 */
+            border-radius: 15px;
+            display: flex;
+            box-shadow: 10px 10px 20px rgba(0,0,0,0.5);
+        }
+
+        #secret-area {
+            width: 300px;
+            padding: 20px;
+            border-right: 5px solid #8b4513;
+            position: relative;
+        }
+
+        #secret-cover {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 280px;
+            height: 280px;
+            background-color: #d2b48c; /* 木色遮罩 */
+            border: 2px solid #a0522d;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2em;
+            color: #8b4513;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .cat-marble {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin: 5px;
+            background-size: cover;
+            border: 2px solid #ccc;
+        }
+
+        #guess-area {
+            flex-grow: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #next-guess-row {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .guess-slot {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #8b4513;
+            border-radius: 10px;
+            margin: 5px;
+            background-color: rgba(255,255,255,0.5);
+            cursor: pointer;
+        }
+
+        #result-area {
+            overflow-y: scroll;
+            flex-grow: 1;
+        }
+
+        .result-row {
+            display: flex;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .hint-dots {
+            margin-left: 20px;
+            display: grid;
+            grid-template-columns: repeat(3, 10px);
+            grid-gap: 5px;
+        }
+
+        .hint-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #ccc;
+        }
+
+        .hint-dot.black {
+            background-color: black;
+        }
+
+        .hint-dot.white {
+            background-color: white;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-board">
+        <div id="secret-area">
+            <h2>Animal heads</h2>
+            <div id="secret-cover">?</div>
+            <div id="secret-combination" style="display: flex;">
+                <div class="cat-marble" style="background-image: url('https://vickyleaps.com/images/mastermind/blue-cat.png');"></div>
+                <div class="cat-marble" style="background-image: url('https://vickyleaps.com/images/mastermind/red-cat.png');"></div>
+                <div class="cat-marble" style="background-image: url('https://vickyleaps.com/images/mastermind/yellow-cat.png');"></div>
+                <div class="cat-marble" style="background-image: url('https://vickyleaps.com/images/mastermind/green-cat.png');"></div>
+            </div>
+        </div>
+        <div id="guess-area">
+            <h2>Player Guess</h2>
+            <div id="next-guess-row">
+                <h3>Next Guess</h3>
+                <div class="guess-slot" onclick="selectColor(0)"></div>
+                <div class="guess-slot" onclick="selectColor(1)"></div>
+                <div class="guess-slot" onclick="selectColor(2)"></div>
+                <div class="guess-slot" onclick="selectColor(3)"></div>
+                <button onclick="submitGuess()">Submit</button>
+            </div>
+            <div id="result-area">
+                <div class="result-row">
+                    <div class="guess-slot" style="background-image: url('https://vickyleaps.com/images/mastermind/blue-cat.png');"></div>
+                    <div class="guess-slot" style="background-image: url('https://vickyleaps.com/images/mastermind/yellow-cat.png');"></div>
+                    <div class="guess-slot"></div>
+                    <div class="guess-slot"></div>
+                    <div class="hint-dots">
+                        <div class="hint-dot black"></div>
+                        <div class="hint-dot white"></div>
+                        <div class="hint-dot"></div>
+                        <div class="hint-dot"></div>
+                    </div>
+                </div>
+                <!-- 更多結果行會在這裡動態新增 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 這裡會放置遊戲的邏輯，例如：
+        // 1. 生成秘密組合
+        // 2. 處理玩家選擇顏色
+        // 3. 檢查猜測並提供提示
+        // 4. 更新 UI
+
+        function selectColor(slotIndex) {
+            console.log("Selected slot:", slotIndex);
+            // 這裡會實作顏色選擇的邏輯
+        }
+
+        function submitGuess() {
+            console.log("Guess submitted!");
+            // 這裡會實作提交猜測的邏輯
+        }
+    </script>
+</body>
+</html>
 

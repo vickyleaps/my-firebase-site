@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Vicky's page</title>
+    <!-- 引入卡通手寫/蠟筆風格字型 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crafty+Girls&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Crafty Girls', cursive, "Comic Sans MS", sans-serif;
+            background-color: #fcf8f2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #333;
+        }
+
+        /* 標題樣式：蠟筆手寫風與繽紛顏色 */
+        h1 {
+            font-size: 3rem;
+            color: #ff5964;
+            text-shadow: 2px 2px 0px #ffca3a, 4px 4px 0px #8ac926;
+            margin-bottom: 2rem;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+
+        /* 表格設定：透明 Border (邊框無痕) */
+        table {
+            border-collapse: collapse;
+            border: none; /* 透明/無邊框 */
+            margin: 0 auto;
+        }
+
+        td, th {
+            border: none; /* 單元格透明無邊框 */
+            padding: 15px 30px;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        /* 第一列（文字）：字型與樣式 */
+        .header-text {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #35a7ff;
+            text-shadow: 1px 1px 0px #ffca3a;
+        }
+
+        /* 第二列（Icon 容器）：固定 200px x 200px */
+        .icon-box {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* 漫畫黑粗邊框風格 */
+            border: 4px solid #2b2d42;
+            box-shadow: 5px 5px 0px #2b2d42;
+            transition: transform 0.2s ease;
+            cursor: pointer;
+        }
+
+        .icon-box:hover {
+            transform: scale(1.05) rotate(-2deg);
+        }
+
+        /* 漫畫風 Game Icon 背景與圖案 */
+        .game-icon-bg {
+            background-color: #ffca3a;
+        }
+
+        /* 漫畫風 Course Icon 背景與圖案 */
+        .course-icon-bg {
+            background-color: #8ac926;
+        }
+
+        /* 漫畫風格 SVG 繪圖圖示 */
+        .comic-svg {
+            width: 120px;
+            height: 120px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 標題 Row -->
+    <h1>Welcome to Vicky's page</h1>
+
+    <!-- 2 Columns x 2 Rows 表格 (透明邊框) -->
+    <table>
+        <!-- Row 1: 文字標題 -->
+        <tr>
+            <td class="header-text">Game</td>
+            <td class="header-text">Course</td>
+        </tr>
+        <!-- Row 2: 漫畫風 Icon (200px x 200px) -->
+        <tr>
+            <td>
+                <div class="icon-box game-icon-bg">
+                    <!-- 漫畫風格 掌上手把 SVG -->
+                    <svg class="comic-svg" viewBox="0 0 100 100" fill="none" stroke="#2b2d42" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="15" y="30" width="70" height="40" rx="15" fill="#ff5964" />
+                        <!-- 方向鍵 -->
+                        <path d="M 30 42 V 58 M 22 50 H 38" stroke-width="5" />
+                        <!-- 按鈕 -->
+                        <circle cx="65" cy="44" r="3" fill="#2b2d42" />
+                        <circle cx="73" cy="52" r="3" fill="#2b2d42" />
+                    </svg>
+                </div>
+            </td>
+            <td>
+                <div class="icon-box course-icon-bg">
+                    <!-- 漫畫風格 書本/課程 SVG -->
+                    <svg class="comic-svg" viewBox="0 0 100 100" fill="none" stroke="#2b2d42" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M 20 25 Q 50 15 50 30 Q 50 15 80 25 V 75 Q 50 65 50 80 Q 50 65 20 75 Z" fill="#1982c4" />
+                        <path d="M 50 30 V 80" />
+                        <!-- 書頁線條 -->
+                        <path d="M 28 38 Q 40 32 45 35" stroke-width="3" />
+                        <path d="M 28 48 Q 40 42 45 45" stroke-width="3" />
+                    </svg>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+</body>
+</html>

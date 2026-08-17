@@ -1,11 +1,10 @@
 {
   "hosting": {
-    "public": ".",
-    "rewrites": [
-      {
-        "source": "/games/mastermind",
-        "destination": "/games/mastermind/index.html"
-      }
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
     ]
   }
 }

@@ -3,285 +3,175 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>香港國安法 - 知識問答</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background-color: #0f172a;
-      color: #f8fafc;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-      padding: 20px;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-    }
-    .card {
-      background: #1e293b;
-      padding: 30px;
-      border-radius: 16px;
-      width: 100%;
-      max-width: 700px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-      margin-bottom: 20px;
-    }
-    h1, h2 { text-align: center; margin-bottom: 20px; color: #38bdf8; }
-    .form-group { margin-bottom: 15px; }
-    label { display: block; margin-bottom: 5px; font-weight: bold; }
-    input[type="text"], input[type="email"] {
-      width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #475569;
-      background: #0f172a; color: #fff; font-size: 1rem;
-    }
-    .btn {
-      width: 100%; padding: 14px; border: none; border-radius: 8px;
-      background: #0284c7; color: white; font-size: 1.1rem; font-weight: bold;
-      cursor: pointer; transition: 0.2s; margin-top: 10px;
-    }
-    .btn:hover { background: #0369a1; }
-    .error { color: #f87171; font-size: 0.9rem; margin-top: 5px; }
-    .hidden { display: none; }
-    
-    .question-block {
-      background: #334155; padding: 20px; border-radius: 12px; margin-bottom: 20px;
-    }
-    .q-title { font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; white-space: pre-line; }
-    .options label {
-      display: block; background: #1e293b; padding: 10px 15px; border-radius: 8px;
-      margin-bottom: 8px; cursor: pointer; border: 1px solid #475569;
-    }
-    .options label:hover { background: #475569; }
-    .options input { margin-right: 10px; }
-
-    .history-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-    .history-table th, .history-table td { border: 1px solid #475569; padding: 8px; text-align: center; }
-    .history-table th { background: #0f172a; }
-  </style>
+  <title>香港國安法 - 知識測驗</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-slate-900 text-white min-h-screen flex flex-col justify-center items-center p-4">
 
-  <div class="card">
-    <a href="Q_A.html" style="color: #94a3b8; text-decoration: none;">← 返回主頁</a>
-    <h1>香港國安法問答題</h1>
+  <div id="quiz-card" class="bg-slate-800 p-6 md:p-8 rounded-2xl shadow-xl w-full max-w-2xl border border-slate-700">
+    <button onclick="window.location.href='index.html'" class="text-slate-400 hover:text-white text-sm mb-4 inline-block">← 返回主頁</button>
+    <h1 class="text-2xl font-bold text-center text-sky-400 mb-2">香港國安法問答題</h1>
+    <p id="user-info" class="text-center text-slate-400 text-sm mb-6"></p>
 
-    <!-- 1. 登入介面 -->
-    <div id="login-section">
-      <form id="loginForm">
-        <div class="form-group">
-          <label>電子郵件 (Email):</label>
-          <input type="email" id="userEmail" required placeholder="example@email.com">
-        </div>
-        <div class="form-group">
-          <label>參與者名稱 (5-10個純英文字母):</label>
-          <input type="text" id="userName" required placeholder="如：JohnChan">
-          <div id="nameError" class="error"></div>
-        </div>
-        <button type="submit" class="btn">登入並開始測驗</button>
-      </form>
+    <!-- 題目區域 -->
+    <div id="question-container" class="space-y-6">
+      <div class="bg-slate-700/50 p-4 rounded-lg border border-slate-600">
+        <h2 id="question-text" class="text-lg font-semibold text-slate-100 whitespace-pre-line">載入題目中...</h2>
+      </div>
+
+      <!-- 選項區域 -->
+      <div id="options-container" class="space-y-3"></div>
+
+      <button id="next-btn" onclick="submitAnswer()" class="w-full py-3 bg-sky-600 hover:bg-sky-500 rounded-lg font-bold text-white transition duration-200 mt-4">
+        下一題
+      </button>
     </div>
 
-    <!-- 2. 測驗介面 -->
-    <div id="quiz-section" class="hidden">
-      <div id="user-info" style="margin-bottom: 15px; color: #94a3b8;"></div>
-      <form id="quizForm">
-        <div id="questions-container"></div>
-        <button type="submit" class="btn">提交答案</button>
-      </form>
-    </div>
-
-    <!-- 3. 測驗結果與歷史紀錄 -->
-    <div id="result-section" class="hidden">
-      <h2>測驗結果</h2>
-      <p id="score-text" style="font-size: 1.3rem; text-align: center; margin-bottom: 20px;"></p>
-      <div id="result-details"></div>
-      
-      <h3 style="margin-top: 30px; color: #38bdf8;">最近 10 次測驗紀錄</h3>
-      <table class="history-table">
-        <thead>
-          <tr>
-            <th>次數</th>
-            <th>得分</th>
-            <th>日期時間</th>
-          </tr>
-        </thead>
-        <tbody id="history-body"></tbody>
-      </table>
-
-      <button id="retryBtn" class="btn" style="margin-top: 20px;">再考一次</button>
+    <!-- 結果區域 -->
+    <div id="result-container" class="hidden text-center space-y-6">
+      <h2 class="text-3xl font-bold text-sky-400">測驗完成！</h2>
+      <p id="score-text" class="text-2xl font-semibold"></p>
+      <button onclick="window.location.href='index.html'" class="w-full py-3 bg-sky-600 hover:bg-sky-500 rounded-lg font-bold text-white transition">
+        返回首頁
+      </button>
     </div>
   </div>
 
   <script type="module">
     import { db } from './firebase-config.js';
-    import { 
-      doc, setDoc, collection, addDoc, getDoc, getDocs, 
-      query, orderBy, deleteDoc, serverTimestamp 
-    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { collection, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    let currentUser = { email: '', name: '' };
-    let currentQuestions = [];
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (!currentUser) {
+      window.location.href = 'index.html';
+    } else {
+      document.getElementById('user-info').innerText = `參與者：${currentUser.name} (${currentUser.email})`;
+    }
 
-    // --- 登入驗證（5-10字純英文）---
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('userEmail').value.trim().toLowerCase();
-      const name = document.getElementById('userName').value.trim();
-      const nameError = document.getElementById('nameError');
+    let questions = [];
+    let currentIndex = 0;
+    let score = 0;
+    let selectedOption = null;
 
-      const nameRegex = /^[a-zA-Z]{5,10}$/;
-      if (!nameRegex.test(name)) {
-        nameError.innerText = "名稱必須為 5 至 10 個純英文字母，不能包含空格、數字或符號！";
+    async function loadQuestions() {
+      try {
+        const querySnapshot = await getDocs(collection(db, "questions_nsl"));
+        let singleList = [];
+        let comboList = [];
+
+        querySnapshot.forEach((doc) => {
+          const data = { id: doc.id, ...doc.data() };
+          if (doc.id.startsWith('q1')) {
+            comboList.push(data);
+          } else {
+            singleList.push(data);
+          }
+        });
+
+        singleList.sort(() => Math.random() - 0.5);
+        comboList.sort(() => Math.random() - 0.5);
+
+        questions = [...singleList.slice(0, 10), ...comboList.slice(0, 5)];
+        
+        if (questions.length === 0) {
+          document.getElementById('question-text').innerText = "題庫中無可用題目，請先進行匯入。";
+          document.getElementById('next-btn').classList.add('hidden');
+          return;
+        }
+
+        renderQuestion();
+      } catch (err) {
+        console.error(err);
+        document.getElementById('question-text').innerText = "載入題目失敗：" + err.message;
+      }
+    }
+
+    function renderQuestion() {
+      selectedOption = null;
+      const q = questions[currentIndex];
+      
+      document.getElementById('question-text').innerText = `第 ${currentIndex + 1} 題：${q.question}`;
+
+      const nextBtn = document.getElementById('next-btn');
+      if (currentIndex === questions.length - 1) {
+        nextBtn.innerText = "提交最後一條答案，完成問答";
+        nextBtn.classList.remove('bg-sky-600', 'hover:bg-sky-500');
+        nextBtn.classList.add('bg-emerald-600', 'hover:bg-emerald-500');
+      } else {
+        nextBtn.innerText = "下一題";
+        nextBtn.classList.remove('bg-emerald-600', 'hover:bg-emerald-500');
+        nextBtn.classList.add('bg-sky-600', 'hover:bg-sky-500');
+      }
+
+      const optionsDiv = document.getElementById('options-container');
+      optionsDiv.innerHTML = '';
+
+      const keys = ['A', 'B', 'C', 'D'];
+      keys.forEach(key => {
+        if (q.options && q.options[key]) {
+          const btn = document.createElement('div');
+          btn.className = "flex items-center space-x-3 p-3 bg-slate-700/40 hover:bg-slate-700 border border-slate-600 rounded-lg cursor-pointer transition";
+          btn.onclick = () => selectOption(key, btn);
+          btn.innerHTML = `
+            <input type="radio" name="option" value="${key}" class="w-4 h-4 text-sky-500">
+            <span class="text-slate-200">${key}. ${q.options[key]}</span>
+          `;
+          optionsDiv.appendChild(btn);
+        }
+      });
+    }
+
+    function selectOption(key, element) {
+      selectedOption = key;
+      document.querySelectorAll('#options-container > div').forEach(el => {
+        el.classList.remove('bg-sky-900/50', 'border-sky-500');
+        el.classList.add('bg-slate-700/40', 'border-slate-600');
+        el.querySelector('input').checked = false;
+      });
+      element.classList.remove('bg-slate-700/40', 'border-slate-600');
+      element.classList.add('bg-sky-900/50', 'border-sky-500');
+      element.querySelector('input').checked = true;
+    }
+
+    window.submitAnswer = async function() {
+      if (!selectedOption) {
+        alert('請先選擇一個答案！');
         return;
       }
-      nameError.innerText = "";
-      currentUser = { email, name };
 
-      document.getElementById('login-section').classList.add('hidden');
-      document.getElementById('quiz-section').classList.remove('hidden');
-      document.getElementById('user-info').innerText = `參與者：${name} (${email})`;
+      if (selectedOption === questions[currentIndex].answer) {
+        score++;
+      }
 
-      await loadRandomQuestions();
-    });
+      currentIndex++;
 
-    // --- 隨機抽 15 題（20次不重複）---
-    async function loadRandomQuestions() {
-      const container = document.getElementById('questions-container');
-      container.innerHTML = "正在載入題目...";
+      if (currentIndex < questions.length) {
+        renderQuestion();
+      } else {
+        await finishQuiz();
+      }
+    };
 
-      let usedIds = JSON.parse(localStorage.getItem('nsl_used_ids') || '[]');
+    async function finishQuiz() {
+      document.getElementById('question-container').classList.add('hidden');
+      document.getElementById('result-container').classList.remove('hidden');
+      document.getElementById('score-text').innerText = `你的得分：${score} / ${questions.length}`;
 
-      // 抽 10 條單選 (q001-q100) + 5 條多選 (q101-q150)
-      let selectedIds = [];
-      selectedIds.push(...pickRandomIds(1, 100, 10, usedIds));
-      selectedIds.push(...pickRandomIds(101, 150, 5, usedIds));
-
-      selectedIds.sort(() => Math.random() - 0.5);
-
-      usedIds = [...usedIds, ...selectedIds];
-      if (usedIds.length > 300) usedIds = usedIds.slice(usedIds.length - 300);
-      localStorage.setItem('nsl_used_ids', JSON.stringify(usedIds));
-
-      currentQuestions = [];
-      container.innerHTML = "";
-
-      for (let i = 0; i < selectedIds.length; i++) {
-        const qId = selectedIds[i];
-        const docSnap = await getDoc(doc(db, "questions_nsl", qId));
-        if (docSnap.exists()) {
-          const qData = docSnap.data();
-          currentQuestions.push({ docId: qId, ...qData });
-          
-          const qDiv = document.createElement('div');
-          qDiv.className = 'question-block';
-          qDiv.id = `q-block-${i}`;
-          qDiv.innerHTML = `
-            <div class="q-title">第 ${i + 1} 題: ${qData.question}</div>
-            <div class="options">
-              ${Object.entries(qData.options).map(([key, opt]) => `
-                <label>
-                  <input type="radio" name="q_${i}" value="${key}" required>
-                  <strong>${key}.</strong> ${opt}
-                </label>
-              `).join('')}
-            </div>
-          `;
-          container.appendChild(qDiv);
-        }
+      try {
+        await addDoc(collection(db, "history"), {
+          userEmail: currentUser.email,
+          userName: currentUser.name,
+          quizType: "香港國安法",
+          score: score,
+          totalQuestions: questions.length,
+          timestamp: serverTimestamp()
+        });
+      } catch (err) {
+        console.error("寫入歷史紀錄失敗：", err);
       }
     }
 
-    function pickRandomIds(min, max, count, used) {
-      let pool = [];
-      for (let i = min; i <= max; i++) {
-        let idStr = 'q' + String(i).padStart(3, '0');
-        if (!used.includes(idStr)) pool.push(idStr);
-      }
-      if (pool.length < count) {
-        pool = [];
-        for (let i = min; i <= max; i++) pool.push('q' + String(i).padStart(3, '0'));
-      }
-      pool.sort(() => Math.random() - 0.5);
-      return pool.slice(0, count);
-    }
-
-    // --- 提交與結果報告 ---
-    document.getElementById('quizForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      let score = 0;
-
-      currentQuestions.forEach((q, i) => {
-        const selected = document.querySelector(`input[name="q_${i}"]:checked`)?.value;
-        const qBlock = document.getElementById(`q-block-${i}`);
-        
-        if (selected === q.answer) {
-          score++;
-          qBlock.style.borderLeft = "6px solid #22c55e";
-        } else {
-          qBlock.style.borderLeft = "6px solid #ef4444";
-        }
-      });
-
-      await saveScoreAndKeepTop10(currentUser.email, currentUser.name, score, "NSL");
-
-      document.getElementById('quiz-section').classList.add('hidden');
-      document.getElementById('result-section').classList.remove('hidden');
-      document.getElementById('score-text').innerText = `你一共答對了 ${score} / 15 題！`;
-
-      const details = document.getElementById('result-details');
-      details.innerHTML = "";
-      document.querySelectorAll('.question-block').forEach((el, idx) => {
-        const userAns = document.querySelector(`input[name="q_${idx}"]:checked`)?.value;
-        const correctAns = currentQuestions[idx].answer;
-        const info = document.createElement('div');
-        info.style.marginBottom = "10px";
-        info.innerHTML = `<p style="color: ${userAns === correctAns ? '#4ade80' : '#f87171'}">
-          第 ${idx+1} 題：你選了 (${userAns || '未答'}) | 正確答案是 (${correctAns})
-        </p>`;
-        details.appendChild(info);
-      });
-
-      await loadHistory(currentUser.email);
-    });
-
-    async function saveScoreAndKeepTop10(email, name, score, category) {
-      const userRef = doc(db, "users", email);
-      await setDoc(userRef, { name, email, updatedAt: serverTimestamp() }, { merge: true });
-
-      const historyRef = collection(db, "users", email, "history");
-      await addDoc(historyRef, { score, total: 15, category, timestamp: serverTimestamp() });
-
-      const q = query(historyRef, orderBy("timestamp", "desc"));
-      const snapshot = await getDocs(q);
-
-      if (snapshot.docs.length > 10) {
-        const oldDocs = snapshot.docs.slice(10);
-        for (const docSnap of oldDocs) {
-          await deleteDoc(doc(db, "users", email, "history", docSnap.id));
-        }
-      }
-    }
-
-    async function loadHistory(email) {
-      const historyRef = collection(db, "users", email, "history");
-      const q = query(historyRef, orderBy("timestamp", "desc"));
-      const snapshot = await getDocs(q);
-      const tbody = document.getElementById('history-body');
-      tbody.innerHTML = "";
-
-      snapshot.docs.forEach((docSnap, index) => {
-        const data = docSnap.data();
-        const dateStr = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleString() : '剛才';
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${index + 1}</td>
-          <td>${data.score} / 15</td>
-          <td>${dateStr}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    document.getElementById('retryBtn').addEventListener('click', () => {
-      location.reload();
-    });
+    loadQuestions();
   </script>
 </body>
 </html>

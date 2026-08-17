@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>香港基本法和國安法知識問答平台</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #0b132b;
+      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .header-title {
+      font-size: 2rem;
+      margin-bottom: 40px;
+      text-align: center;
+      letter-spacing: 2px;
+      color: #e0e1dd;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    }
+
+    /* 按鈕容器：Mobile 垂直排列，Desktop 水平排列 */
+    .btn-container {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      width: 100%;
+      max-width: 600px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    @media (min-width: 768px) {
+      .btn-container {
+        flex-direction: row;
+        max-width: 800px;
+      }
+    }
+
+    /* 核心按鈕與 Mouseover 著燈效果 */
+    .quiz-btn {
+      width: 100%;
+      max-width: 300px;
+      padding: 25px 30px;
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #ffffff;
+      text-align: center;
+      text-decoration: none;
+      background: #1c2541;
+      border: 2px solid #3a506b;
+      border-radius: 16px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    /* 國安法按鈕 - 懸停著燈 (藍光) */
+    .btn-nsl:hover {
+      background: #0077b6;
+      border-color: #90e0ef;
+      color: #ffffff;
+      transform: translateY(-5px) scale(1.03);
+      box-shadow: 0 0 15px #00b4d8,
+                  0 0 30px #00b4d8,
+                  0 0 45px #00b4d8;
+    }
+
+    /* 基本法按鈕 - 懸停著燈 (綠/翠藍光) */
+    .btn-bl:hover {
+      background: #0f9f90;
+      border-color: #80ed99;
+      color: #ffffff;
+      transform: translateY(-5px) scale(1.03);
+      box-shadow: 0 0 15px #52b788,
+                  0 0 30px #52b788,
+                  0 0 45px #52b788;
+    }
+
+    /* 點擊時的回饋感 */
+    .quiz-btn:active {
+      transform: translateY(-2px) scale(0.98);
+    }
+  </style>
+</head>
+<body>
+
+  <h1 class="header-title">請選擇問答題主題</h1>
+
+  <div class="btn-container">
+    <a href="nsl.html" class="quiz-btn btn-nsl">香港國安法</a>
+    <a href="bl.html" class="quiz-btn btn-bl">香港基本法</a>
+  </div>
+
+</body>
+</html>

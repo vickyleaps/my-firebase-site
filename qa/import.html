@@ -3,51 +3,102 @@
 <head>
   <meta charset="UTF-8">
   <title>題目批量匯入工具</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #f8fafc; }
+    button { padding: 10px 15px; margin: 5px; font-weight: bold; cursor: pointer; }
+    #status { margin-top: 15px; font-weight: bold; }
+  </style>
 </head>
 <body>
   <h2>Firestore 題目庫批量匯入</h2>
-  <button id="importNsl">匯入 香港國安法 題目庫</button>
-  <button id="importBl">匯入 香港基本法 題目庫</button>
-  <p id="status"></p>
+  <button id="importNslBtn">匯入 香港國安法 題目庫</button>
+  <button id="importBlBtn">匯入 香港基本法 題目庫</button>
+
+  <div id="status"></div>
 
   <script type="module">
     import { db } from './firebase-config.js';
     import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // 範例資料結構（實際使用時可將 150 題放在 JSON 檔匯入）
-    const sampleNslQuestions = [
+    // --- 1. 國安法預設題目 ---
+    const nslQuestions = [
       {
         id: "q001",
-        type: "single",
-        question: "《香港國安法》於哪一年哪一月哪一日在香港特區實施？",
-        options: { A: "2020年6月30日", B: "2020年7月1日", C: "2019年10月1日", D: "2021年1月1日" },
+        question: "根據《香港國安法》第一條，制定本法的目的是為了維護國家安全，防範、制止和懲治與香港特別行政區有關的哪些犯罪？",
+        options: {
+          A: "分裂國家、顛覆國家政權、組織實施恐怖活動、勾結外國或者境外勢力危害國家安全",
+          B: "盜竊、詐騙、洗黑錢、貪污",
+          C: "非法集結、強盜、縱火、毀壞公物",
+          D: "走私、販毒、非法入境、網路犯罪"
+        },
         answer: "A"
       },
       {
-        id: "q101",
-        type: "multiple",
-        question: "根據《香港國安法》，以下哪些屬於維護國家安全四大罪行？\n(1) 分裂國家罪\n(2) 顛覆國家政權罪\n(3) 恐怖活動罪\n(4) 勾結外國或者境外勢力危害國家安全罪",
-        options: { A: "只有 (1)(2) 正確", B: "只有 (2)(3)(4) 正確", C: "只有 (1)(3)(4) 正確", D: "全部 (1)(2)(3)(4) 正確" },
-        answer: "D"
+        id: "q002",
+        question: "《香港國安法》規定，香港特別行政區維護國家安全委員會（國安委）由誰擔任主席？",
+        options: {
+          A: "律政司司長",
+          B: "香港特別行政區行政長官",
+          C: "警務處處長",
+          D: "保安局局長"
+        },
+        answer: "B"
       }
     ];
 
-    async function uploadQuestions(collectionName, data) {
-      const statusEl = document.getElementById('status');
-      statusEl.innerText = "正在上傳...";
+    // --- 2. 基本法預設題目 ---
+    const blQuestions = [
+      {
+        id: "q001",
+        question: "根據《基本法》第一條，香港特別行政區是什麼的不可分離的部分？",
+        options: {
+          A: "中華人民共和國",
+          B: "聯合國",
+          C: "廣東省",
+          D: "英聯邦"
+        },
+        answer: "A"
+      },
+      {
+        id: "q002",
+        question: "根據《基本法》第五條，香港特別行政區不實行社會主義制度和政策，保持原有的資本主義制度和生活方式，多少年不變？",
+        options: {
+          A: "三十年",
+          B: "五十載（五十年）",
+          C: "七十年",
+          D: "一百年"
+        },
+        answer: "B"
+      }
+    ];
+
+    // --- 3. 匯入邏輯 ---
+    async function importData(collectionName, dataList) {
+      const statusDiv = document.getElementById('status');
+      statusDiv.style.color = "blue";
+      statusDiv.innerText = `正在匯入至 ${collectionName}...`;
+
       try {
-        for (const q of data) {
-          // 以 q001, q002 等作為 Document ID 寫入資料庫
-          await setDoc(doc(db, collectionName, q.id), q);
+        for (const item of dataList) {
+          const { id, ...data } = item;
+          await setDoc(doc(db, collectionName, id), data);
         }
-        statusEl.innerText = `上傳成功！已匯入至 ${collectionName}`;
+        statusDiv.style.color = "green";
+        statusDiv.innerText = `上傳成功！已成功匯入至 ${collectionName}（共 ${dataList.length} 題）`;
       } catch (err) {
-        statusEl.innerText = "上傳失敗：" + err.message;
+        statusDiv.style.color = "red";
+        statusDiv.innerText = "上傳失敗：" + err.message;
       }
     }
 
-    document.getElementById('importNsl').addEventListener('click', () => {
-      uploadQuestions('questions_nsl', sampleNslQuestions);
+    // 綁定國安法按鈕
+    document.getElementById('importNslBtn').addEventListener('click', () => {
+      importData('questions_nsl', nslQuestions);
+    });
+
+    // 綁定基本法按鈕
+    document.getElementById('importBlBtn').addEventListener('click', () => {
+      importData('questions_bl', blQuestions);
     });
   </script>
 </body>

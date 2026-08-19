@@ -10,7 +10,7 @@
 
   <div class="bg-slate-800 p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-700">
     <button onclick="window.location.href='Q_A.html'" class="text-slate-400 hover:text-white text-sm mb-4 inline-block">← 返回主題選擇</button>
-    <h1 class="text-2xl font-bold text-center text-sky-400 mb-2">Login</h1>
+    <h1 class="text-2xl font-bold text-center text-sky-400 mb-2">參與者登入</h1>
     <p id="target-quiz-text" class="text-center text-slate-300 text-sm font-semibold mb-6"></p>
 
     <!-- 正式登入表單 -->
@@ -65,16 +65,16 @@
 
   <script type="module">
     import { db } from './firebase-config.js';
-    import { collection, getDocs, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const urlParams = new URLSearchParams(window.location.search);
     const target = urlParams.get('target');
     const targetQuizText = document.getElementById('target-quiz-text');
 
     if (target === 'bl') {
-      targetQuizText.innerText = '香港基本法';
+      targetQuizText.innerText = '目標測驗：香港基本法';
     } else if (target === 'nsl') {
-      targetQuizText.innerText = '香港國安法';
+      targetQuizText.innerText = '目標測驗：香港國安法';
     } else {
       targetQuizText.innerText = '請選擇測驗主題';
     }
@@ -132,11 +132,10 @@
       listDiv.innerHTML = '<p class="text-slate-400 text-center py-4">正在載入紀錄...</p>';
 
       try {
+        // 只使用 where 查詢，避開需要在 Firestore 建立 Index 的問題
         const q = query(
           collection(db, "history"),
-          where("userEmail", "==", email),
-          orderBy("timestamp", "desc"),
-          limit(20)
+          where("userEmail", "==", email)
         );
 
         const snapshot = await getDocs(q);
@@ -146,9 +145,23 @@
           return;
         }
 
-        listDiv.innerHTML = '';
+        let records = [];
         snapshot.docs.forEach(docSnap => {
-          const data = docSnap.data();
+          records.push({ id: docSnap.id, ...docSnap.data() });
+        });
+
+        // 在前端 JS 手動排序 (最新時間在前)
+        records.sort((a, b) => {
+          const timeA = a.timestamp ? a.timestamp.seconds : 0;
+          const timeB = b.timestamp ? b.timestamp.seconds : 0;
+          return timeB - timeA;
+        });
+
+        // 只截取最多 20 筆
+        records = records.slice(0, 20);
+
+        listDiv.innerHTML = '';
+        records.forEach(data => {
           const dateStr = data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleString('zh-HK') : '近期';
           const scorePercent = Math.round((data.score / data.totalQuestions) * 100);
 

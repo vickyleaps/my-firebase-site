@@ -74,7 +74,7 @@
           allList.push({ id: doc.id, ...doc.data() });
         });
 
-        // 完全隨機抽 15 題
+        // 隨機抽 15 題
         allList.sort(() => Math.random() - 0.5);
         questions = allList.slice(0, 15);
 

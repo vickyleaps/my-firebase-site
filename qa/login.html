@@ -10,7 +10,7 @@
 
   <div class="bg-slate-800 p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-700">
     <button onclick="window.location.href='Q_A.html'" class="text-slate-400 hover:text-white text-sm mb-4 inline-block">← 返回主題選擇</button>
-    <h1 class="text-2xl font-bold text-center text-sky-400 mb-2">參與者登入</h1>
+    <h1 class="text-2xl font-bold text-center text-sky-400 mb-2">Login</h1>
     <p id="target-quiz-text" class="text-center text-slate-300 text-sm font-semibold mb-6"></p>
 
     <!-- 正式登入表單 -->
@@ -72,9 +72,9 @@
     const targetQuizText = document.getElementById('target-quiz-text');
 
     if (target === 'bl') {
-      targetQuizText.innerText = '目標測驗：香港基本法';
+      targetQuizText.innerText = '香港基本法';
     } else if (target === 'nsl') {
-      targetQuizText.innerText = '目標測驗：香港國安法';
+      targetQuizText.innerText = '香港國安法';
     } else {
       targetQuizText.innerText = '請選擇測驗主題';
     }

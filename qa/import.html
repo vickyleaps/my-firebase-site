@@ -74,32 +74,17 @@
 
   <div class="card">
     <h1>題庫洗牌與 Firebase 匯入工具</h1>
-    <p>此工具將生成基本法（200題）與國安法（200題）之題庫，並進行隨機洗牌，最後批次 <code>question_banks</code> 集合中。</p>
+    <p>此工具將生成基本法（200題）與國安法（200題）之題庫，並進行隨機洗牌，最後寫入 Firestore 中。</p>
     
-    <button id="importBtn" onclick="startImport()">🚀 開始洗牌並批次匯入至 Firestore</button>
+    <button id="importBtn" onclick="startImport()">🚀 開始洗牌並寫入至 Firestore</button>
 
     <div id="status">準備就緒，請點擊上方按鈕開始...</div>
   </div>
 
-  <!-- Firebase SDK -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, doc, writeBatch, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { db } from './firebase-config.js';
+    import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // ⚠️ 請替換為您的 Firebase 專案設定 ⚠️
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    // Fisher-Yates 洗牌演算法
     function shuffleArray(array) {
       for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -108,11 +93,9 @@
       return array;
     }
 
-    // 生成單一主題題庫 (130 題單選 + 70 題複選)
     function generateQuestionBank(type, name) {
       const bank = [];
 
-      // 1. 生成 130 題單選擇題 (乾淨文字，無 [單選 Qxx] 標籤)
       for (let i = 1; i <= 130; i++) {
         const correctIndex = Math.floor(Math.random() * 4);
         const answerKey = ['A', 'B', 'C', 'D'][correctIndex];
@@ -127,43 +110,36 @@
         const shuffledOpts = [...baseOpts];
         shuffleArray(shuffledOpts);
 
-        const optionsObj = {
-          A: `(1) ${shuffledOpts[0]}`,
-          B: `(2) ${shuffledOpts[1]}`,
-          C: `(3) ${shuffledOpts[2]}`,
-          D: `(4) ${shuffledOpts[3]}`
-        };
-
         bank.push({
           question: `關於《${name}》相關規定與實施範疇，下列哪項敘述完全正確？`,
-          options: optionsObj,
+          options: {
+            A: `(1) ${shuffledOpts[0]}`,
+            B: `(2) ${shuffledOpts[1]}`,
+            C: `(3) ${shuffledOpts[2]}`,
+            D: `(4) ${shuffledOpts[3]}`
+          },
           answer: answerKey
         });
       }
 
-      // 2. 生成 70 題複合選擇題 (乾淨文字，無 [複選 Qxx] 標籤)
       for (let i = 1; i <= 70; i++) {
         const comboKeys = ['A', 'B', 'C', 'D'];
         const answerKey = comboKeys[Math.floor(Math.random() * comboKeys.length)];
 
-        const optionsObj = {
-          A: '(1)(2)(3)',
-          B: '(1)(2)(4)',
-          C: '(2)(3)(4)',
-          D: '(1)(2)(3)(4)'
-        };
-
         bank.push({
           question: `根據《${name}》相關規範，下列哪些屬於維護特區法治與憲制秩序之重要原則？\n(1) 依法保障居民基本權利與自由\n(2) 遵循罪刑法定與無罪推定原則\n(3) 獨立的司法權和終審權\n(4) 任何機構與個人皆須遵守法律`,
-          options: optionsObj,
+          options: {
+            A: '(1)(2)(3)',
+            B: '(1)(2)(4)',
+            C: '(2)(3)(4)',
+            D: '(1)(2)(3)(4)'
+          },
           answer: answerKey
         });
       }
 
-      // 隨機洗牌題目順序
       shuffleArray(bank);
 
-      // 為洗牌後的題目附加 1~200 的 id 索引
       return bank.map((q, index) => ({
         id: index + 1,
         question: q.question,
@@ -172,44 +148,50 @@
       }));
     }
 
-    // 全域匯入函式
+    // 帶 Timeout 的寫入包裝，防止卡死
+    function setDocWithTimeout(docRef, data, timeoutMs = 5000) {
+      return Promise.race([
+        setDoc(docRef, data),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error("寫入超時！請檢查 Firebase Rules 權限設定")), timeoutMs)
+        )
+      ]);
+    }
+
     window.startImport = async function() {
       const btn = document.getElementById('importBtn');
       const status = document.getElementById('status');
       
       btn.disabled = true;
-      status.innerText = "正在生成並洗牌題目資料...\n";
+      status.innerText = "🚀 開始生成題目並進行洗牌...\n";
 
       try {
         const blQuestions = generateQuestionBank('bl', '香港基本法');
         const nslQuestions = generateQuestionBank('nsl', '香港國安法');
 
-        status.innerText += `[✓] 香港基本法：200 題生成完畢並已洗牌\n`;
-        status.innerText += `[✓] 香港國安法：200 題生成完畢並已洗牌\n`;
-        status.innerText += "正在發送至 Firestore...\n";
+        status.innerText += `[✓] 洗牌完成！準備寫入 Firestore...\n\n`;
 
-        const batch = writeBatch(db);
+        status.innerText += `👉 寫入 基本法 (questions_bl)...\n`;
+        for (let i = 0; i < blQuestions.length; i++) {
+          const q = blQuestions[i];
+          await setDocWithTimeout(doc(db, "questions_bl", String(q.id)), q);
+          if ((i + 1) % 20 === 0 || i === blQuestions.length - 1) {
+            status.innerText += `   - 基本法進度：${i + 1} / 200 題\n`;
+          }
+        }
 
-        // 寫入 bl 文件
-        const blRef = doc(db, "question_banks", "bl");
-        batch.set(blRef, {
-          title: "香港基本法問答題",
-          updatedAt: serverTimestamp(),
-          questions: blQuestions
-        });
+        status.innerText += `\n👉 寫入 國安法 (questions_nsl)...\n`;
+        for (let i = 0; i < nslQuestions.length; i++) {
+          const q = nslQuestions[i];
+          await setDocWithTimeout(doc(db, "questions_nsl", String(q.id)), q);
+          if ((i + 1) % 20 === 0 || i === nslQuestions.length - 1) {
+            status.innerText += `   - 國安法進度：${i + 1} / 200 題\n`;
+          }
+        }
 
-        // 寫入 nsl 文件
-        const nslRef = doc(db, "question_banks", "nsl");
-        batch.set(nslRef, {
-          title: "香港國安法問答題",
-          updatedAt: serverTimestamp(),
-          questions: nslQuestions
-        });
-
-        await batch.commit();
-
-        status.innerText += "\n🎉 匯入成功！所有題庫已更新至 Firestore。";
+        status.innerText += "\n🎉 所有題庫已成功更新！";
         status.style.borderColor = "#10b981";
+
       } catch (error) {
         console.error("匯入失敗：", error);
         status.innerText += `\n❌ 匯入失敗：${error.message}`;

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>學習儀表板 & 歷史紀錄</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-white min-h-screen flex flex-col justify-center items-center p-4">
+
+  <div class="bg-slate-800 p-6 md:p-8 rounded-2xl shadow-xl w-full max-w-3xl border border-slate-700 my-6 space-y-6">
+    <div class="flex justify-between items-center border-b border-slate-700 pb-4">
+      <div>
+        <h1 class="text-2xl font-bold text-sky-400">🇭🇰 知識測驗儀表板</h1>
+        <p id="user-display" class="text-slate-400 text-sm mt-1">載入中...</p>
+      </div>
+      <button onclick="logout()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm transition">登出 / 切換帳號</button>
+    </div>
+
+    <!-- 進入測驗按鈕 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <button onclick="window.location.href='bl.html'" class="p-5 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 rounded-xl font-bold text-lg shadow-lg transition text-center">
+        📖 開始《香港基本法》測驗
+      </button>
+      <button onclick="window.location.href='nsl.html'" class="p-5 bg-gradient-to-r from-sky-600 to-blue-700 hover:from-sky-500 hover:to-blue-600 rounded-xl font-bold text-lg shadow-lg transition text-center">
+        🛡️ 開始《香港國安法》測驗
+      </button>
+    </div>
+
+    <!-- 歷史成績區域 -->
+    <div class="space-y-4 pt-4">
+      <h2 class="text-xl font-bold text-slate-200 flex items-center justify-between">
+        <span>📊 最近答題紀錄 (最多 20 筆)</span>
+        <span id="record-count" class="text-xs bg-slate-700 text-slate-300 px-3 py-1 rounded-full">0 筆</span>
+      </h2>
+
+      <div id="history-list" class="space-y-3 max-h-[350px] overflow-y-auto pr-2">
+        <p class="text-slate-500 text-center py-6">正在讀取歷史紀錄...</p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { db } from './firebase-config.js';
+    import { collection, getDocs, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+
+    if (!user) {
+      window.location.href = 'login.html';
+    } else {
+      document.getElementById('user-display').innerText = `使用者：${user.name} (${user.email})`;
+      if (user.isGuest) {
+        document.getElementById('history-list').innerHTML = `<p class="text-yellow-400 text-center py-6">⚠️ 目前為訪客模式，不會記錄測驗成績。</p>`;
+      } else {
+        fetchHistory(user.email);
+      }
+    }
+
+    async function fetchHistory(email) {
+      const historyList = document.getElementById('history-list');
+      try {
+        const q = query(
+          collection(db, "history"),
+          where("userEmail", "==", email),
+          orderBy("timestamp", "desc"),
+          limit(20)
+        );
+
+        const snapshot = await getDocs(q);
+        document.getElementById('record-count').innerText = `${snapshot.docs.length} / 20 筆`;
+
+        if (snapshot.empty) {
+          historyList.innerHTML = `<p class="text-slate-400 text-center py-6">尚未有任何測驗紀錄，快點擊上方按鈕開始吧！</p>`;
+          return;
+        }
+
+        historyList.innerHTML = '';
+        snapshot.docs.forEach(docSnap => {
+          const data = docSnap.data();
+          const dateStr = data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleString('zh-HK') : '近期';
+          const scorePercent = Math.round((data.score / data.totalQuestions) * 100);
+
+          const card = document.createElement('div');
+          card.className = "bg-slate-700/50 p-4 rounded-xl border border-slate-600 flex justify-between items-center";
+          card.innerHTML = `
+            <div>
+              <div class="font-bold text-slate-100">${data.quizType || '知識測驗'}</div>
+              <div class="text-xs text-slate-400 mt-1">時間：${dateStr}</div>
+            </div>
+            <div class="text-right">
+              <span class="text-2xl font-extrabold ${scorePercent >= 80 ? 'text-emerald-400' : scorePercent >= 60 ? 'text-yellow-400' : 'text-rose-400'}">
+                ${data.score} / ${data.totalQuestions}
+              </span>
+              <div class="text-xs text-slate-400">得分率 ${scorePercent}%</div>
+            </div>
+          `;
+          historyList.appendChild(card);
+        });
+
+      } catch (err) {
+        console.error(err);
+        historyList.innerHTML = `<p class="text-rose-400 text-center py-4">讀取歷史紀錄失敗：${err.message}</p>`;
+      }
+    }
+
+    window.logout = function() {
+      localStorage.removeItem('currentUser');
+      window.location.href = 'login.html';
+    };
+  </script>
+</body>
+</html>

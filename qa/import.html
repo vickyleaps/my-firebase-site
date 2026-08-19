@@ -1,160 +1,222 @@
 <!DOCTYPE html>
-<html lang="zh-HK">
+<html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>題庫重新匯入工具</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>題庫資料匯入工具 - Firestore Batch Import</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: #0f172a;
+      color: #f8fafc;
+      padding: 2rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .card {
+      background-color: #1e293b;
+      padding: 2.5rem;
+      border-radius: 1rem;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+      max-width: 600px;
+      width: 100%;
+    }
+    h1 {
+      font-size: 1.5rem;
+      margin-top: 0;
+      color: #38bdf8;
+      border-bottom: 2px solid #334155;
+      padding-bottom: 0.75rem;
+    }
+    p {
+      color: #94a3b8;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+    button {
+      background-color: #10b981;
+      color: #ffffff;
+      border: none;
+      padding: 0.85rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 1.5rem;
+      transition: background-color 0.2s ease;
+    }
+    button:hover {
+      background-color: #059669;
+    }
+    button:disabled {
+      background-color: #475569;
+      cursor: not-allowed;
+    }
+    #status {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      background-color: #0f172a;
+      border: 1px solid #334155;
+      font-family: monospace;
+      font-size: 0.9rem;
+      white-space: pre-wrap;
+      max-height: 250px;
+      overflow-y: auto;
+    }
+  </style>
 </head>
-<body class="bg-slate-900 text-white p-6 min-h-screen flex flex-col items-center justify-center">
+<body>
 
-  <div class="bg-slate-800 p-8 rounded-2xl max-w-lg w-full text-center shadow-xl border border-slate-700 space-y-6">
-    <h1 class="text-2xl font-bold text-sky-400">🇭🇰 400 題庫隨機洗牌匯入工具</h1>
-    <p class="text-slate-300 text-sm">
-      • 已剔除「第幾條/條例編號」記憶型題目<br>
-      • 4 個選項完全獨立不重複，正解位置隨機分佈<br>
-      • 點擊下方按鈕將清除舊題庫並寫入全新 400 題
-    </p>
+  <div class="card">
+    <h1>題庫洗牌與 Firebase 匯入工具</h1>
+    <p>此工具將生成基本法（200題）與國安法（200題）之題庫，並進行隨機洗牌，最後批次寫入 Firestore 的 <code>question_banks</code> 集合中。</p>
+    
+    <button id="importBtn" onclick="startImport()">🚀 開始洗牌並批次匯入至 Firestore</button>
 
-    <div id="status" class="p-4 bg-slate-900/80 rounded-xl text-yellow-400 font-mono text-sm min-h-[120px] max-h-[200px] text-left overflow-y-auto border border-slate-700">
-      狀態：等待操作...
-    </div>
-
-    <button id="importBtn" onclick="startImport()" class="w-full py-4 bg-emerald-600 hover:bg-emerald-500 rounded-xl font-bold text-lg text-white shadow-lg transition active:scale-95">
-      🚀 開始洗牌並批次匯入至 Firestore
-    </button>
+    <div id="status">準備就緒，請點擊上方按鈕開始...</div>
   </div>
 
+  <!-- Firebase SDK -->
   <script type="module">
-    import { db } from './firebase-config.js';
-    import { collection, writeBatch, doc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, writeBatch, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    function log(msg) {
-      const statusDiv = document.getElementById('status');
-      statusDiv.innerHTML += `<div>> ${msg}</div>`;
-      statusDiv.scrollTop = statusDiv.scrollHeight;
-    }
-
-    const optionKeys = ['A', 'B', 'C', 'D'];
-
-    // Fisher-Yates 真正隨機洗牌演算法
-    function shuffleArray(array) {
-      const arr = [...array];
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-      return arr;
-    }
-
-    function generateBank(type) {
-      const bank = [];
-      const isBL = type === 'bl';
-      const name = isBL ? '香港基本法' : '香港國安法';
-
-      // 1. 生成 130 題單選擇題 (答案位置隨機洗牌，選項不重複)
-      for (let i = 1; i <= 130; i++) {
-        const correctText = `屬於《${name}》規定的法定職權與憲制保障規範`;
-        const wrongTexts = [
-          `非由特別行政區自治範疇所涵蓋之事項`,
-          `僅適用於國際條約規範與外部事務`,
-          `須經中央人民政府外交部特許方可執行`
-        ];
-
-        // 組合 4 個完全不重複的選項並隨機打亂
-        const rawOptions = shuffleArray([correctText, ...wrongTexts]);
-        const optionsObj = {};
-        let answerKey = 'A';
-
-        optionKeys.forEach((key, index) => {
-          optionsObj[key] = rawOptions[index];
-          if (rawOptions[index] === correctText) {
-            answerKey = key; // 記錄隨機洗牌後正解落在哪個字母 (A/B/C/D)
-          }
-        });
-
-        bank.push({
-          question: `[單選 Q${i}] 關於《${name}》相關規定與實施範疇，下列哪項敘述完全正確？`,
-          options: optionsObj,
-          answer: answerKey
-        });
-      }
-
-      // 2. 生成 70 題複合選擇題 (答案位置隨機洗牌，選項不重複)
-      for (let i = 1; i <= 70; i++) {
-        const correctText = "(1)(2)(3)(4)";
-        const wrongTexts = ["(1)(2)(3)", "(1)(2)(4)", "(2)(3)(4)"];
-
-        const rawOptions = shuffleArray([correctText, ...wrongTexts]);
-        const optionsObj = {};
-        let answerKey = 'A';
-
-        optionKeys.forEach((key, index) => {
-          optionsObj[key] = rawOptions[index];
-          if (rawOptions[index] === correctText) {
-            answerKey = key;
-          }
-        });
-
-        bank.push({
-          question: `[複選 Q${i}] 根據《${name}》相關規範，下列哪些屬於維護特區法治與憲制秩序之重要原則？\n(1) 依法保障居民基本權利與自由\n(2) 遵循罪刑法定與無罪推定原則\n(3) 獨立的司法權和終審權\n(4) 任何機構與個人皆須遵守法律`,
-          options: optionsObj,
-          answer: answerKey
-        });
-      }
-
-      return bank;
-    }
-
-    // 清空舊題庫
-    async function clearCollection(colName) {
-      const snapshot = await getDocs(collection(db, colName));
-      const batch = writeBatch(db);
-      snapshot.docs.forEach(doc => batch.delete(doc.ref));
-      await batch.commit();
-    }
-
-    window.startImport = async function() {
-      const btn = document.getElementById('importBtn');
-      btn.disabled = true;
-      btn.classList.add('opacity-50', 'cursor-not-allowed');
-
-      try {
-        log("1. 正在清空舊題庫資料...");
-        await clearCollection('questions_bl');
-        await clearCollection('questions_nsl');
-
-        log("2. 生成隨機洗牌題庫（答案隨機打散）...");
-        const blBank = generateBank('bl');
-        const nslBank = generateBank('nsl');
-
-        log("3. 開始寫入 基本法 200 題...");
-        await batchSave('questions_bl', blBank);
-
-        log("4. 開始寫入 國安法 200 題...");
-        await batchSave('questions_nsl', nslBank);
-
-        log("🎉 全部 400 條題目已重新洗牌並成功寫入 Firestore！");
-      } catch (err) {
-        log(`❌ 匯入失敗: ${err.message}`);
-        btn.disabled = false;
-        btn.classList.remove('opacity-50', 'cursor-not-allowed');
-      }
+    // ⚠️ 請替換為您的 Firebase 專案設定 ⚠️
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
     };
 
-    async function batchSave(colName, items) {
-      const batchSize = 100;
-      for (let i = 0; i < items.length; i += batchSize) {
-        const chunk = items.slice(i, i + batchSize);
-        const batch = writeBatch(db);
-        chunk.forEach(item => {
-          const ref = doc(collection(db, colName));
-          batch.set(ref, item);
-        });
-        await batch.commit();
-        log(`...已儲存 ${Math.min(i + batchSize, items.length)} / ${items.length} 題`);
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Fisher-Yates 洗牌演算法
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
       }
+      return array;
     }
+
+    // 生成單一主題題庫 (130 題單選 + 70 題複選)
+    function generateQuestionBank(type, name) {
+      const bank = [];
+
+      // 1. 生成 130 題單選擇題 (乾淨文字，無 [單選 Qxx] 標籤)
+      for (let i = 1; i <= 130; i++) {
+        const correctIndex = Math.floor(Math.random() * 4);
+        const answerKey = ['A', 'B', 'C', 'D'][correctIndex];
+
+        const baseOpts = [
+          `落實特區維護國家安全的法律制度與執行機制`,
+          `遵循國際人權公約適用於特區的相關規定`,
+          `保障行政、立法與司法機關依法獨立行使職權`,
+          `維護中華人民共和國憲法與特區基本法確立的憲制秩序`
+        ];
+
+        const shuffledOpts = [...baseOpts];
+        shuffleArray(shuffledOpts);
+
+        const optionsObj = {
+          A: `(1) ${shuffledOpts[0]}`,
+          B: `(2) ${shuffledOpts[1]}`,
+          C: `(3) ${shuffledOpts[2]}`,
+          D: `(4) ${shuffledOpts[3]}`
+        };
+
+        bank.push({
+          question: `關於《${name}》相關規定與實施範疇，下列哪項敘述完全正確？`,
+          options: optionsObj,
+          answer: answerKey
+        });
+      }
+
+      // 2. 生成 70 題複合選擇題 (乾淨文字，無 [複選 Qxx] 標籤)
+      for (let i = 1; i <= 70; i++) {
+        const comboKeys = ['A', 'B', 'C', 'D'];
+        const answerKey = comboKeys[Math.floor(Math.random() * comboKeys.length)];
+
+        const optionsObj = {
+          A: '(1)(2)(3)',
+          B: '(1)(2)(4)',
+          C: '(2)(3)(4)',
+          D: '(1)(2)(3)(4)'
+        };
+
+        bank.push({
+          question: `根據《${name}》相關規範，下列哪些屬於維護特區法治與憲制秩序之重要原則？\n(1) 依法保障居民基本權利與自由\n(2) 遵循罪刑法定與無罪推定原則\n(3) 獨立的司法權和終審權\n(4) 任何機構與個人皆須遵守法律`,
+          options: optionsObj,
+          answer: answerKey
+        });
+      }
+
+      // 隨機洗牌題目順序
+      shuffleArray(bank);
+
+      // 為洗牌後的題目附加 1~200 的 id 索引
+      return bank.map((q, index) => ({
+        id: index + 1,
+        question: q.question,
+        options: q.options,
+        answer: q.answer
+      }));
+    }
+
+    // 全域匯入函式
+    window.startImport = async function() {
+      const btn = document.getElementById('importBtn');
+      const status = document.getElementById('status');
+      
+      btn.disabled = true;
+      status.innerText = "正在生成並洗牌題目資料...\n";
+
+      try {
+        const blQuestions = generateQuestionBank('bl', '香港基本法');
+        const nslQuestions = generateQuestionBank('nsl', '香港國安法');
+
+        status.innerText += `[✓] 香港基本法：200 題生成完畢並已洗牌\n`;
+        status.innerText += `[✓] 香港國安法：200 題生成完畢並已洗牌\n`;
+        status.innerText += "正在發送至 Firestore...\n";
+
+        const batch = writeBatch(db);
+
+        // 寫入 bl 文件
+        const blRef = doc(db, "question_banks", "bl");
+        batch.set(blRef, {
+          title: "香港基本法問答題",
+          updatedAt: serverTimestamp(),
+          questions: blQuestions
+        });
+
+        // 寫入 nsl 文件
+        const nslRef = doc(db, "question_banks", "nsl");
+        batch.set(nslRef, {
+          title: "香港國安法問答題",
+          updatedAt: serverTimestamp(),
+          questions: nslQuestions
+        });
+
+        await batch.commit();
+
+        status.innerText += "\n🎉 匯入成功！所有題庫已更新至 Firestore。";
+        status.style.borderColor = "#10b981";
+      } catch (error) {
+        console.error("匯入失敗：", error);
+        status.innerText += `\n❌ 匯入失敗：${error.message}`;
+        status.style.borderColor = "#ef4444";
+        btn.disabled = false;
+      }
+    };
   </script>
 </body>
 </html>

@@ -3,17 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>問答平台 - 參與者登入</title>
+  <title>問答平台 - Login Page</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-900 text-white min-h-screen flex flex-col justify-center items-center p-4">
 
   <div class="bg-slate-800 p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-700">
     <button onclick="window.location.href='Q_A.html'" class="text-slate-400 hover:text-white text-sm mb-4 inline-block">← 返回主題選擇</button>
-    <h1 class="text-2xl font-bold text-center text-sky-400 mb-2">參與者登入</h1>
+    <h1 class="text-2xl font-bold text-center text-sky-400 mb-2">Login</h1>
     <p id="target-quiz-text" class="text-center text-slate-300 text-sm font-semibold mb-6"></p>
 
-    <!-- 正式登入表單 -->
     <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
       <div>
         <label class="block text-sm font-medium text-slate-300 mb-1">名字 (5-10位英數字，無空格符號)</label>
@@ -25,7 +24,7 @@
       </div>
 
       <button type="submit" class="w-full py-3 bg-sky-600 hover:bg-sky-500 rounded-lg font-bold text-white transition">
-        登入並開始測驗 (可記錄最多20次結果)
+        Login 並開始測驗 (可記錄最多20次結果)
       </button>
 
       <button type="button" onclick="checkHistory()" class="w-full py-2 bg-slate-700 hover:bg-slate-600 border border-slate-600 rounded-lg text-sm font-medium text-sky-300 hover:text-sky-200 transition">
@@ -43,7 +42,6 @@
     </button>
   </div>
 
-  <!-- 歷史成績彈出視窗 (Modal) -->
   <div id="history-modal" class="fixed inset-0 bg-black/70 flex items-center justify-center p-4 hidden z-50">
     <div class="bg-slate-800 p-6 rounded-2xl max-w-md w-full border border-slate-700 shadow-2xl space-y-4 max-h-[85vh] flex flex-col">
       <div class="flex justify-between items-center border-b border-slate-700 pb-3">
@@ -72,14 +70,13 @@
     const targetQuizText = document.getElementById('target-quiz-text');
 
     if (target === 'bl') {
-      targetQuizText.innerText = '目標測驗：香港基本法';
+      targetQuizText.innerText = '香港基本法';
     } else if (target === 'nsl') {
-      targetQuizText.innerText = '目標測驗：香港國安法';
+      targetQuizText.innerText = '香港國安法';
     } else {
-      targetQuizText.innerText = '請選擇測驗主題';
+      targetQuizText.innerText = '請選擇';
     }
 
-    // 自動帶入上一次登入過的名字與 Email
     const savedUser = JSON.parse(localStorage.getItem('currentUser'));
     if (savedUser && !savedUser.isGuest) {
       if (savedUser.name) document.getElementById('username').value = savedUser.name;
@@ -94,26 +91,18 @@
       const user = { name: name, email: email, isGuest: false };
       localStorage.setItem('currentUser', JSON.stringify(user));
 
-      if (target === 'bl') {
-        window.location.href = 'bl.html';
-      } else if (target === 'nsl') {
-        window.location.href = 'nsl.html';
-      } else {
-        window.location.href = 'Q_A.html';
-      }
+      if (target === 'bl') window.location.href = 'bl.html';
+      else if (target === 'nsl') window.location.href = 'nsl.html';
+      else window.location.href = 'Q_A.html';
     };
 
     window.handleGuestLogin = function() {
       const guestUser = { name: "訪客", email: "guest@local", isGuest: true };
       localStorage.setItem('currentUser', JSON.stringify(guestUser));
 
-      if (target === 'bl') {
-        window.location.href = 'bl.html';
-      } else if (target === 'nsl') {
-        window.location.href = 'nsl.html';
-      } else {
-        window.location.href = 'Q_A.html';
-      }
+      if (target === 'bl') window.location.href = 'bl.html';
+      else if (target === 'nsl') window.location.href = 'nsl.html';
+      else window.location.href = 'Q_A.html';
     };
 
     window.checkHistory = async function() {
@@ -132,7 +121,6 @@
       listDiv.innerHTML = '<p class="text-slate-400 text-center py-4">正在載入紀錄...</p>';
 
       try {
-        // 只使用 where 查詢，避開需要在 Firestore 建立 Index 的問題
         const q = query(
           collection(db, "history"),
           where("userEmail", "==", email)
@@ -150,14 +138,12 @@
           records.push({ id: docSnap.id, ...docSnap.data() });
         });
 
-        // 在前端 JS 手動排序 (最新時間在前)
         records.sort((a, b) => {
           const timeA = a.timestamp ? a.timestamp.seconds : 0;
           const timeB = b.timestamp ? b.timestamp.seconds : 0;
           return timeB - timeA;
         });
 
-        // 只截取最多 20 筆
         records = records.slice(0, 20);
 
         listDiv.innerHTML = '';

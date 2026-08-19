@@ -36,6 +36,7 @@
     let currentIndex = 0;
     let score = 0;
     let selectedAnswer = null;
+    let wrongAnswers = [];
 
     const currentUser = JSON.parse(localStorage.getItem('currentUser')) || { name: '訪客', email: 'guest@local', isGuest: true };
     document.getElementById('user-display').innerText = `參與者：${currentUser.name} (${currentUser.email})`;
@@ -67,8 +68,6 @@
       }
 
       const q = questions[currentIndex];
-
-      // 🛠️ 強制自動過濾任何 [單選 Qxx]、[複選 Qxx] 格式文字
       const cleanQuestion = q.question.replace(/\[(單選|複選)\s*Q?\d+\]\s*/gi, '');
       document.getElementById('question-title').innerText = `第 ${currentIndex + 1} 題：${cleanQuestion}`;
 
@@ -93,8 +92,19 @@
     }
 
     window.handleNextQuestion = async function() {
-      if (selectedAnswer === questions[currentIndex].answer) {
+      const q = questions[currentIndex];
+      const cleanQ = q.question.replace(/\[(單選|複選)\s*Q?\d+\]\s*/gi, '');
+
+      if (selectedAnswer === q.answer) {
         score++;
+      } else {
+        wrongAnswers.push({
+          num: currentIndex + 1,
+          title: cleanQ,
+          options: q.options,
+          userAns: selectedAnswer,
+          correctAns: q.answer
+        });
       }
 
       currentIndex++;
@@ -105,13 +115,52 @@
       }
     };
 
+    window.toggleWrongAnswers = function() {
+      const list = document.getElementById('wrong-answers-list');
+      if (list) {
+        list.classList.toggle('hidden');
+      }
+    };
+
     async function finishQuiz() {
       const container = document.querySelector('.space-y-6');
+
+      let wrongHtml = '';
+      if (wrongAnswers.length > 0) {
+        wrongHtml = `
+          <div>
+            <button onclick="toggleWrongAnswers()" class="text-emerald-400 hover:text-emerald-300 underline font-medium cursor-pointer py-1 text-sm">
+              🔍 查看答錯的題目 (${wrongAnswers.length} 題)
+            </button>
+          </div>
+          <div id="wrong-answers-list" class="hidden text-left space-y-4 mt-4 max-h-[50vh] overflow-y-auto pr-2">
+            ${wrongAnswers.map(item => `
+              <div class="bg-slate-700/60 p-4 rounded-xl border border-slate-600 space-y-2">
+                <div class="font-semibold text-slate-100 text-base">第 ${item.num} 題：${item.title}</div>
+                <div class="text-sm text-rose-400 font-medium">
+                  ✖ 你的答案：(${item.userAns}) ${item.options[item.userAns]}
+                </div>
+                <div class="text-sm text-emerald-400 font-semibold">
+                  ✓ 正確答案：(${item.correctAns}) ${item.options[item.correctAns]}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } else {
+        wrongHtml = `<p class="text-emerald-400 font-semibold text-lg">🎉 太厲害了！全對！</p>`;
+      }
+
       container.innerHTML = `
-        <div class="text-center py-8 space-y-4">
+        <div class="text-center py-6 space-y-4">
           <h2 class="text-3xl font-extrabold text-emerald-400">測驗完成！</h2>
-          <p class="text-xl text-slate-200">得分：<span class="text-emerald-400 font-bold">${score}</span> / ${questions.length}</p>
-          <button onclick="window.location.href='login.html?target=bl'" class="mt-4 px-6 py-2.5 bg-emerald-600 rounded-lg text-white font-bold">返回首頁</button>
+          <p class="text-xl text-slate-200">得分：<span class="text-emerald-400 font-bold text-2xl">${score}</span> / ${questions.length}</p>
+          
+          ${wrongHtml}
+
+          <div class="pt-4">
+            <button onclick="window.location.href='login.html?target=bl'" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-white font-bold transition">返回首頁</button>
+          </div>
         </div>
       `;
 

@@ -12,62 +12,172 @@
     <button onclick="window.location.href='Q_A.html'" class="text-slate-400 hover:text-white text-sm mb-4 inline-block">← 返回主題選擇</button>
     <h1 class="text-2xl font-bold text-center text-sky-400 mb-2">參與者登入</h1>
     <p id="target-quiz-text" class="text-center text-slate-300 text-sm font-semibold mb-6"></p>
-    
+
     <!-- 正式登入表單 -->
     <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
       <div>
         <label class="block text-sm font-medium text-slate-300 mb-1">名字 (5-10位英數字，無空格符號)</label>
-        <input type="text" id="username" required pattern="[a-zA-Z0-9]{5,10}" title="名字必須由 5 至 10 個英文字母或數字組成，不能有空格或符號" placeholder="例如: Alex88" class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-sky-500">
+        <input type="text" id="username" required pattern="[a-zA-Z0-9]{5,10}" title="名字必須由 5 至 10 個英文字母或數字組成，不能有空格或符號" placeholder="例如: AJ12345" class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-sky-500">
       </div>
       <div>
         <label class="block text-sm font-medium text-slate-300 mb-1">Email</label>
         <input type="email" id="email" required placeholder="name@example.com" class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-sky-500">
       </div>
+
       <button type="submit" class="w-full py-3 bg-sky-600 hover:bg-sky-500 rounded-lg font-bold text-white transition">
         登入並開始測驗 (可記錄最多20次結果)
+      </button>
+
+      <button type="button" onclick="checkHistory()" class="w-full py-2 bg-slate-700 hover:bg-slate-600 border border-slate-600 rounded-lg text-sm font-medium text-sky-300 hover:text-sky-200 transition">
+        📊 查看此 Email 過往成績 (最多20次)
       </button>
     </form>
 
     <div class="relative my-6">
       <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-700"></div></div>
-      <div class="relative flex justify-center text-sm"><span class="px-2 bg-slate-800 text-slate-400">或</span></div>
+      <div class="relative flex justify-center text-xs text-slate-400"><span class="bg-slate-800 px-2">或</span></div>
     </div>
 
-    <!-- Guest 登入區塊 -->
-    <div class="text-center">
-      <button onclick="handleGuestLogin()" class="w-full py-3 bg-slate-700 hover:bg-slate-600 rounded-lg font-bold text-slate-200 transition border border-slate-600">
-        以 Guest (訪客) 身分直接開始
+    <button onclick="handleGuestLogin()" class="w-full py-3 bg-slate-700 hover:bg-slate-600 border border-slate-600 rounded-lg font-medium text-slate-300 transition">
+      以訪客身份直接開始 (不記錄成績)
+    </button>
+  </div>
+
+  <!-- 歷史成績彈出視窗 (Modal) -->
+  <div id="history-modal" class="fixed inset-0 bg-black/70 flex items-center justify-center p-4 hidden z-50">
+    <div class="bg-slate-800 p-6 rounded-2xl max-w-md w-full border border-slate-700 shadow-2xl space-y-4 max-h-[85vh] flex flex-col">
+      <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+        <h2 class="text-xl font-bold text-sky-400">📊 歷史測驗紀錄 (最多20筆)</h2>
+        <button onclick="closeHistory()" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
+      </div>
+      
+      <p id="history-user-info" class="text-sm text-slate-300 font-medium"></p>
+
+      <div id="history-list" class="space-y-3 overflow-y-auto flex-1 pr-1">
+        <p class="text-slate-400 text-center py-4">讀取中...</p>
+      </div>
+
+      <button onclick="closeHistory()" class="w-full py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-white text-sm font-medium transition">
+        關閉
       </button>
-      <p class="text-xs text-amber-400 mt-2 font-medium">⚠️ 若選用 Guest login，答題結果將不會被紀錄。</p>
     </div>
   </div>
 
-  <script>
+  <script type="module">
+    import { db } from './firebase-config.js';
+    import { collection, getDocs, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
     const urlParams = new URLSearchParams(window.location.search);
-    const target = urlParams.get('target') || 'nsl';
+    const target = urlParams.get('target');
+    const targetQuizText = document.getElementById('target-quiz-text');
 
-    const targetText = document.getElementById('target-quiz-text');
     if (target === 'bl') {
-      targetText.innerText = '即將進入：香港基本法問答';
+      targetQuizText.innerText = '目標測驗：香港基本法';
+    } else if (target === 'nsl') {
+      targetQuizText.innerText = '目標測驗：香港國安法';
     } else {
-      targetText.innerText = '即將進入：香港國安法問答';
+      targetQuizText.innerText = '請選擇測驗主題';
     }
 
-    function handleLogin(e) {
+    // 自動帶入上一次登入過的名字與 Email
+    const savedUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (savedUser && !savedUser.isGuest) {
+      if (savedUser.name) document.getElementById('username').value = savedUser.name;
+      if (savedUser.email) document.getElementById('email').value = savedUser.email;
+    }
+
+    window.handleLogin = function(e) {
       e.preventDefault();
-      const name = document.getElementById('username').value;
-      const email = document.getElementById('email').value;
+      const name = document.getElementById('username').value.trim();
+      const email = document.getElementById('email').value.trim();
 
-      const user = { name, email, isGuest: false };
+      const user = { name: name, email: email, isGuest: false };
       localStorage.setItem('currentUser', JSON.stringify(user));
-      window.location.href = target + '.html';
-    }
 
-    function handleGuestLogin() {
-      const user = { name: 'Guest', email: 'guest@local', isGuest: true };
-      localStorage.setItem('currentUser', JSON.stringify(user));
-      window.location.href = target + '.html';
-    }
+      if (target === 'bl') {
+        window.location.href = 'bl.html';
+      } else if (target === 'nsl') {
+        window.location.href = 'nsl.html';
+      } else {
+        window.location.href = 'Q_A.html';
+      }
+    };
+
+    window.handleGuestLogin = function() {
+      const guestUser = { name: "訪客", email: "guest@local", isGuest: true };
+      localStorage.setItem('currentUser', JSON.stringify(guestUser));
+
+      if (target === 'bl') {
+        window.location.href = 'bl.html';
+      } else if (target === 'nsl') {
+        window.location.href = 'nsl.html';
+      } else {
+        window.location.href = 'Q_A.html';
+      }
+    };
+
+    window.checkHistory = async function() {
+      const email = document.getElementById('email').value.trim();
+      if (!email) {
+        alert('請先輸入 Email 以查詢過往成績！');
+        return;
+      }
+
+      const modal = document.getElementById('history-modal');
+      const listDiv = document.getElementById('history-list');
+      const infoDiv = document.getElementById('history-user-info');
+      
+      modal.classList.remove('hidden');
+      infoDiv.innerText = `查詢 Email：${email}`;
+      listDiv.innerHTML = '<p class="text-slate-400 text-center py-4">正在載入紀錄...</p>';
+
+      try {
+        const q = query(
+          collection(db, "history"),
+          where("userEmail", "==", email),
+          orderBy("timestamp", "desc"),
+          limit(20)
+        );
+
+        const snapshot = await getDocs(q);
+
+        if (snapshot.empty) {
+          listDiv.innerHTML = '<p class="text-slate-400 text-center py-6">查無此 Email 的過往測驗紀錄。</p>';
+          return;
+        }
+
+        listDiv.innerHTML = '';
+        snapshot.docs.forEach(docSnap => {
+          const data = docSnap.data();
+          const dateStr = data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleString('zh-HK') : '近期';
+          const scorePercent = Math.round((data.score / data.totalQuestions) * 100);
+
+          const card = document.createElement('div');
+          card.className = "bg-slate-700/60 p-3.5 rounded-xl border border-slate-600 flex justify-between items-center";
+          card.innerHTML = `
+            <div>
+              <div class="font-bold text-slate-100 text-sm">${data.quizType || '知識測驗'}</div>
+              <div class="text-xs text-slate-400 mt-0.5">${dateStr}</div>
+            </div>
+            <div class="text-right">
+              <span class="text-xl font-extrabold ${scorePercent >= 80 ? 'text-emerald-400' : scorePercent >= 60 ? 'text-yellow-400' : 'text-rose-400'}">
+                ${data.score} / ${data.totalQuestions}
+              </span>
+              <div class="text-xs text-slate-400">得分率 ${scorePercent}%</div>
+            </div>
+          `;
+          listDiv.appendChild(card);
+        });
+
+      } catch (err) {
+        console.error(err);
+        listDiv.innerHTML = `<p class="text-rose-400 text-center py-4">載入失敗：${err.message}</p>`;
+      }
+    };
+
+    window.closeHistory = function() {
+      document.getElementById('history-modal').classList.add('hidden');
+    };
   </script>
 </body>
 </html>

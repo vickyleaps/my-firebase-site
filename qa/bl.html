@@ -8,8 +8,8 @@
 </head>
 <body class="bg-slate-900 text-white min-h-screen flex flex-col justify-center items-center p-4">
 
-  <div id="quiz-card" class="bg-slate-800 p-6 md:p-8 rounded-2xl shadow-xl w-full max-w-2xl border border-slate-700">
-    <button onclick="window.history.back()" class="text-slate-400 hover:text-white text-sm mb-4 inline-block">← 返回</button>
+  <div id="quiz-card" class="bg-slate-800 p-6 md:p-8 rounded-2xl shadow-xl w-full max-w-2xl border border-slate-700 my-6">
+    <button onclick="window.location.href='login.html?target=bl'" class="text-slate-400 hover:text-white text-sm mb-4 inline-block">← 切換使用者</button>
     <h1 class="text-2xl font-bold text-center text-emerald-400 mb-2">香港基本法問答題</h1>
     <p id="user-info" class="text-center text-slate-400 text-sm mb-6"></p>
 
@@ -19,7 +19,6 @@
         <h2 id="question-text" class="text-lg font-semibold text-slate-100 whitespace-pre-line">載入題目中...</h2>
       </div>
 
-      <!-- 選項區域 -->
       <div id="options-container" class="space-y-3"></div>
 
       <button id="next-btn" onclick="submitAnswer()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 rounded-lg font-bold text-white transition duration-200 mt-4">
@@ -31,50 +30,56 @@
     <div id="result-container" class="hidden text-center space-y-6">
       <h2 class="text-3xl font-bold text-emerald-400">測驗完成！</h2>
       <p id="score-text" class="text-2xl font-semibold"></p>
-      <button onclick="window.history.back()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 rounded-lg font-bold text-white transition">
-        返回
+
+      <div id="wrong-link-container" class="hidden">
+        <button onclick="showWrongReview()" class="text-rose-400 hover:text-rose-300 underline font-medium text-lg">
+          查看答錯的問題
+        </button>
+      </div>
+
+      <button onclick="window.location.href='Q_A.html'" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 rounded-lg font-bold text-white transition">
+        回到主選單
       </button>
+    </div>
+
+    <!-- 答錯題目回顧區域 -->
+    <div id="review-container" class="hidden mt-8 border-t border-slate-700 pt-6 text-left">
+      <h3 class="text-xl font-bold text-rose-400 mb-4 text-center">回顧答錯的題目</h3>
+      <div id="wrong-list" class="space-y-6"></div>
     </div>
   </div>
 
   <script type="module">
     import { db } from './firebase-config.js';
-    import { collection, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { collection, getDocs, addDoc, query, where, orderBy, deleteDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // 安全讀取使用者資訊，若無資料則給予預設訪客身份，防止 404 導頁
     let currentUser = JSON.parse(localStorage.getItem('currentUser'));
     if (!currentUser) {
-      currentUser = { name: "訪客", email: "guest@vickyleaps.com" };
+      currentUser = { name: "Guest", email: "guest@local", isGuest: true };
     }
-    document.getElementById('user-info').innerText = `參與者：${currentUser.name} (${currentUser.email})`;
+    document.getElementById('user-info').innerText = `參與者：${currentUser.name} ${currentUser.isGuest ? '(Guest Mode - 無法記錄結果)' : `(${currentUser.email})`}`;
 
     let questions = [];
     let currentIndex = 0;
     let score = 0;
     let selectedOption = null;
+    let wrongQuestions = [];
 
     async function loadQuestions() {
       try {
         const querySnapshot = await getDocs(collection(db, "questions_bl"));
-        let singleList = [];
-        let comboList = [];
+        let allList = [];
 
         querySnapshot.forEach((doc) => {
-          const data = { id: doc.id, ...doc.data() };
-          if (doc.id.startsWith('q1')) {
-            comboList.push(data);
-          } else {
-            singleList.push(data);
-          }
+          allList.push({ id: doc.id, ...doc.data() });
         });
 
-        singleList.sort(() => Math.random() - 0.5);
-        comboList.sort(() => Math.random() - 0.5);
+        // 完全隨機抽 15 題
+        allList.sort(() => Math.random() - 0.5);
+        questions = allList.slice(0, 15);
 
-        questions = [...singleList.slice(0, 10), ...comboList.slice(0, 5)];
-        
         if (questions.length === 0) {
-          document.getElementById('question-text').innerText = "題庫中無可用題目，請先進行匯入。";
+          document.getElementById('question-text').innerText = "題庫中無可用題目。";
           document.getElementById('next-btn').classList.add('hidden');
           return;
         }
@@ -95,19 +100,16 @@
       const nextBtn = document.getElementById('next-btn');
       if (currentIndex === questions.length - 1) {
         nextBtn.innerText = "提交最後一條答案，完成問答";
-        nextBtn.classList.remove('bg-emerald-600', 'hover:bg-emerald-500');
-        nextBtn.classList.add('bg-teal-600', 'hover:bg-teal-500');
+        nextBtn.className = "w-full py-3 rounded-lg font-bold text-white transition duration-200 mt-4 bg-teal-600 hover:bg-teal-500";
       } else {
         nextBtn.innerText = "下一題";
-        nextBtn.classList.remove('bg-teal-600', 'hover:bg-teal-500');
-        nextBtn.classList.add('bg-emerald-600', 'hover:bg-emerald-500');
+        nextBtn.className = "w-full py-3 rounded-lg font-bold text-white transition duration-200 mt-4 bg-emerald-600 hover:bg-emerald-500";
       }
 
       const optionsDiv = document.getElementById('options-container');
       optionsDiv.innerHTML = '';
 
-      const keys = ['A', 'B', 'C', 'D'];
-      keys.forEach(key => {
+      ['A', 'B', 'C', 'D'].forEach(key => {
         if (q.options && q.options[key]) {
           const btn = document.createElement('div');
           btn.className = "flex items-center space-x-3 p-3 bg-slate-700/40 hover:bg-slate-700 border border-slate-600 rounded-lg cursor-pointer transition";
@@ -139,8 +141,18 @@
         return;
       }
 
-      if (selectedOption === questions[currentIndex].answer) {
+      const q = questions[currentIndex];
+      if (selectedOption === q.answer) {
         score++;
+      } else {
+        wrongQuestions.push({
+          num: currentIndex + 1,
+          question: q.question,
+          userAnsKey: selectedOption,
+          userAnsVal: q.options[selectedOption],
+          correctAnsKey: q.answer,
+          correctAnsVal: q.options[q.answer]
+        });
       }
 
       currentIndex++;
@@ -157,19 +169,61 @@
       document.getElementById('result-container').classList.remove('hidden');
       document.getElementById('score-text').innerText = `你的得分：${score} / ${questions.length}`;
 
-      try {
-        await addDoc(collection(db, "history"), {
-          userEmail: currentUser.email,
-          userName: currentUser.name,
-          quizType: "香港基本法",
-          score: score,
-          totalQuestions: questions.length,
-          timestamp: serverTimestamp()
-        });
-      } catch (err) {
-        console.error("寫入歷史紀錄失敗：", err);
+      if (wrongQuestions.length > 0) {
+        document.getElementById('wrong-link-container').classList.remove('hidden');
+      }
+
+      if (!currentUser.isGuest) {
+        try {
+          await addDoc(collection(db, "history"), {
+            userEmail: currentUser.email,
+            userName: currentUser.name,
+            quizType: "香港基本法",
+            score: score,
+            totalQuestions: questions.length,
+            wrongDetails: wrongQuestions,
+            timestamp: serverTimestamp()
+          });
+          await cleanOldHistory(currentUser.email);
+        } catch (err) {
+          console.error("寫入歷史紀錄失敗：", err);
+        }
       }
     }
+
+    async function cleanOldHistory(email) {
+      try {
+        const q = query(collection(db, "history"), where("userEmail", "==", email), orderBy("timestamp", "desc"));
+        const snapshot = await getDocs(q);
+        if (snapshot.docs.length > 20) {
+          for (let i = 20; i < snapshot.docs.length; i++) {
+            await deleteDoc(doc(db, "history", snapshot.docs[i].id));
+          }
+        }
+      } catch (err) {
+        console.error("清理歷史紀錄失敗：", err);
+      }
+    }
+
+    window.showWrongReview = function() {
+      const reviewDiv = document.getElementById('review-container');
+      const listDiv = document.getElementById('wrong-list');
+      reviewDiv.classList.remove('hidden');
+      listDiv.innerHTML = '';
+
+      wrongQuestions.forEach(item => {
+        const card = document.createElement('div');
+        card.className = "bg-slate-700/40 p-4 rounded-lg border border-slate-600 space-y-2";
+        card.innerHTML = `
+          <p class="font-semibold text-slate-100 whitespace-pre-line">第 ${item.num} 題：${item.question}</p>
+          <p class="text-rose-400 font-bold">你的選項：${item.userAnsKey}. ${item.userAnsVal}</p>
+          <p class="text-emerald-400 font-bold">正確答案：${item.correctAnsKey}. ${item.correctAnsVal}</p>
+        `;
+        listDiv.appendChild(card);
+      });
+
+      reviewDiv.scrollIntoView({ behavior: 'smooth' });
+    };
 
     loadQuestions();
   </script>

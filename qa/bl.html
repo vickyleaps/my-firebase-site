@@ -51,7 +51,7 @@
 
   <script type="module">
     import { db } from './firebase-config.js';
-    import { collection, getDocs, addDoc, query, where, orderBy, deleteDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { collection, getDocs, addDoc, query, where, orderBy, deleteDoc, doc, serverTimestamp, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     let currentUser = JSON.parse(localStorage.getItem('currentUser'));
     if (!currentUser) {
@@ -67,16 +67,17 @@
 
     async function loadQuestions() {
       try {
-        const querySnapshot = await getDocs(collection(db, "questions_bl"));
+        // 符合 Firestore 安全規則 request.query.limit <= 15
+        const q = query(collection(db, "questions_bl"), limit(15));
+        const querySnapshot = await getDocs(q);
         let allList = [];
 
         querySnapshot.forEach((doc) => {
           allList.push({ id: doc.id, ...doc.data() });
         });
 
-        // 隨機抽 15 題
-        allList.sort(() => Math.random() - 0.5);
-        questions = allList.slice(0, 15);
+        // 打亂順序
+        questions = allList.sort(() => Math.random() - 0.5);
 
         if (questions.length === 0) {
           document.getElementById('question-text').innerText = "題庫中無可用題目。";

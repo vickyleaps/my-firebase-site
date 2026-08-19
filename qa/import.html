@@ -6,7 +6,7 @@
   <title>題庫資料匯入工具 - Firestore Batch Import</title>
   <style>
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background-color: #0f172a;
       color: #f8fafc;
       padding: 2rem;
@@ -31,11 +31,7 @@
       border-bottom: 2px solid #334155;
       padding-bottom: 0.75rem;
     }
-    p {
-      color: #94a3b8;
-      font-size: 0.95rem;
-      line-height: 1.6;
-    }
+    p { color: #94a3b8; font-size: 0.95rem; line-height: 1.6; }
     button {
       background-color: #10b981;
       color: #ffffff;
@@ -49,13 +45,8 @@
       margin-top: 1.5rem;
       transition: background-color 0.2s ease;
     }
-    button:hover {
-      background-color: #059669;
-    }
-    button:disabled {
-      background-color: #475569;
-      cursor: not-allowed;
-    }
+    button:hover { background-color: #059669; }
+    button:disabled { background-color: #475569; cursor: not-allowed; }
     #status {
       margin-top: 1.5rem;
       padding: 1rem;
@@ -74,7 +65,7 @@
 
   <div class="card">
     <h1>題庫洗牌與 Firebase 匯入工具</h1>
-    <p>此工具將生成基本法（200題）與國安法（200題）之題庫，並進行隨機洗牌，最後寫入 Firestore 中。</p>
+    <p>此工具將生成基本法（200題）與國安法（200題）之乾淨題庫，進行隨機洗牌後寫入至 Firestore。</p>
     
     <button id="importBtn" onclick="startImport()">🚀 開始洗牌並寫入至 Firestore</button>
 
@@ -96,6 +87,7 @@
     function generateQuestionBank(type, name) {
       const bank = [];
 
+      // 1. 130 題單選擇題 (乾淨文字，選項無數字前綴)
       for (let i = 1; i <= 130; i++) {
         const correctIndex = Math.floor(Math.random() * 4);
         const answerKey = ['A', 'B', 'C', 'D'][correctIndex];
@@ -113,15 +105,16 @@
         bank.push({
           question: `關於《${name}》相關規定與實施範疇，下列哪項敘述完全正確？`,
           options: {
-            A: `(1) ${shuffledOpts[0]}`,
-            B: `(2) ${shuffledOpts[1]}`,
-            C: `(3) ${shuffledOpts[2]}`,
-            D: `(4) ${shuffledOpts[3]}`
+            A: shuffledOpts[0],
+            B: shuffledOpts[1],
+            C: shuffledOpts[2],
+            D: shuffledOpts[3]
           },
           answer: answerKey
         });
       }
 
+      // 2. 70 題複合選擇題 (乾淨文字)
       for (let i = 1; i <= 70; i++) {
         const comboKeys = ['A', 'B', 'C', 'D'];
         const answerKey = comboKeys[Math.floor(Math.random() * comboKeys.length)];
@@ -148,12 +141,11 @@
       }));
     }
 
-    // 帶 Timeout 的寫入包裝，防止卡死
     function setDocWithTimeout(docRef, data, timeoutMs = 5000) {
       return Promise.race([
         setDoc(docRef, data),
         new Promise((_, reject) => 
-          setTimeout(() => reject(new Error("寫入超時！請檢查 Firebase Rules 權限設定")), timeoutMs)
+          setTimeout(() => reject(new Error("寫入超時！請檢查 Firebase Rules 設定")), timeoutMs)
         )
       ]);
     }
@@ -174,7 +166,7 @@
         status.innerText += `👉 寫入 基本法 (questions_bl)...\n`;
         for (let i = 0; i < blQuestions.length; i++) {
           const q = blQuestions[i];
-          await setDocWithTimeout(doc(db, "questions_bl", String(q.id)), q);
+          await setDocWithTimeout(doc(docRef => doc(db, "questions_bl", String(q.id))), q);
           if ((i + 1) % 20 === 0 || i === blQuestions.length - 1) {
             status.innerText += `   - 基本法進度：${i + 1} / 200 題\n`;
           }
@@ -183,7 +175,7 @@
         status.innerText += `\n👉 寫入 國安法 (questions_nsl)...\n`;
         for (let i = 0; i < nslQuestions.length; i++) {
           const q = nslQuestions[i];
-          await setDocWithTimeout(doc(db, "questions_nsl", String(q.id)), q);
+          await setDocWithTimeout(doc(docRef => doc(db, "questions_nsl", String(q.id))), q);
           if ((i + 1) % 20 === 0 || i === nslQuestions.length - 1) {
             status.innerText += `   - 國安法進度：${i + 1} / 200 題\n`;
           }

@@ -67,12 +67,14 @@
       }
 
       const q = questions[currentIndex];
-      document.getElementById('question-title').innerText = `第 ${currentIndex + 1} 題：${q.question}`;
+
+      // 🛠️ 強制自動過濾任何 [單選 Qxx]、[複選 Qxx] 格式文字
+      const cleanQuestion = q.question.replace(/\[(單選|複選)\s*Q?\d+\]\s*/gi, '');
+      document.getElementById('question-title').innerText = `第 ${currentIndex + 1} 題：${cleanQuestion}`;
 
       const container = document.getElementById('options-container');
       container.innerHTML = '';
 
-      // ✅ 加上 .sort() 確保永遠按 A, B, C, D 順序排列
       Object.keys(q.options).sort().forEach(key => {
         const optBtn = document.createElement('button');
         optBtn.className = "w-full text-left p-4 rounded-xl bg-slate-700/80 hover:bg-slate-600 border border-slate-600 flex items-center space-x-3 transition";

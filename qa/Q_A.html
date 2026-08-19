@@ -5,24 +5,79 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>香港基本法、香港國安法知識問答平台</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* 按鈕發光效果 */
+    .glow-btn-nsl {
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px rgba(2, 132, 199, 0.4);
+    }
+    .glow-btn-nsl:hover {
+      box-shadow: 0 0 25px rgba(56, 189, 248, 0.8), 0 0 10px rgba(56, 189, 248, 0.5);
+      transform: translateY(-2px);
+    }
+    .glow-btn-nsl:active {
+      transform: translateY(0) scale(0.98);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.9);
+    }
+
+    .glow-btn-bl {
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+    }
+    .glow-btn-bl:hover {
+      box-shadow: 0 0 25px rgba(52, 211, 153, 0.8), 0 0 10px rgba(52, 211, 153, 0.5);
+      transform: translateY(-2px);
+    }
+    .glow-btn-bl:active {
+      transform: translateY(0) scale(0.98);
+      box-shadow: 0 0 15px rgba(52, 211, 153, 0.9);
+    }
+  </style>
 </head>
 <body class="bg-slate-900 text-white min-h-screen flex flex-col justify-center items-center p-4">
 
-  <div class="bg-slate-800 p-8 rounded-2xl shadow-xl w-full max-w-lg border border-slate-700 text-center space-y-6">
-    <h1 class="text-3xl font-extrabold text-sky-400">香港基本法、香港國安法知識問答平台</h1>
-    <p class="text-slate-300">請選擇欲挑戰的問答主題：</p>
+  <div class="bg-slate-800/90 p-8 md:p-10 rounded-2xl shadow-2xl w-full max-w-lg border border-slate-700 text-center space-y-6">
+    
+    <!-- 第 1 行：香港特區區旗 Icon (350px x 200px 置中) -->
+    <div class="flex justify-center items-center">
+      <img 
+        src="https://upload.wikimedia.org/wikipedia/commons/5/5b/Flag_of_Hong_Kong.svg" 
+        alt="香港特別行政區區旗" 
+        style="width: 350px; height: 200px; object-fit: contain;"
+        class="rounded-lg shadow-md"
+      />
+    </div>
 
+    <!-- 標題區域 -->
+    <div class="space-y-1">
+      <!-- 第 2 行："香港基本法" 置中 -->
+      <h1 class="text-3xl font-extrabold text-sky-400 tracking-wide">香港基本法</h1>
+      
+      <!-- 第 3 行："香港國安法" 置中 -->
+      <h1 class="text-3xl font-extrabold text-sky-400 tracking-wide">香港國安法</h1>
+      
+      <!-- 第 4 行："知識問答平台" 置中 -->
+      <h1 class="text-3xl font-extrabold text-sky-400 tracking-wide">知識問答平台</h1>
+    </div>
+
+    <!-- 第 5 行："請選擇欲挑戰的問答主題：" 置中 -->
+    <p class="text-slate-300 font-medium text-base pt-1">請選擇欲挑戰的問答主題：</p>
+
+    <!-- 按鈕區域 (發光與動態效果) -->
     <div class="space-y-4 pt-2">
-      <!-- 按鈕 1: 前往國安法登入頁 -->
-      <a href="login.html?target=nsl" class="block w-full py-4 bg-sky-600 hover:bg-sky-500 rounded-xl font-bold text-lg text-white shadow-lg transition duration-200 transform hover:-translate-y-0.5">
-        🇭🇰 香港國安法問答題
+      <!-- 按鈕 1: 香港國安法問答題 -->
+      <a href="login.html?target=nsl" class="glow-btn-nsl block w-full py-4 bg-sky-600 hover:bg-sky-500 rounded-xl font-bold text-lg text-white shadow-lg flex items-center justify-center space-x-2">
+        
+        <span>香港國安法問答題</span>
       </a>
 
-      <!-- 按鈕 2: 前往基本法登入頁 -->
-      <a href="login.html?target=bl" class="block w-full py-4 bg-emerald-600 hover:bg-emerald-500 rounded-xl font-bold text-lg text-white shadow-lg transition duration-200 transform hover:-translate-y-0.5">
-       🇭🇰  香港基本法問答題
+      <!-- 按鈕 2: 香港基本法問答題 -->
+      <a href="login.html?target=bl" class="glow-btn-bl block w-full py-4 bg-emerald-600 hover:bg-emerald-500 rounded-xl font-bold text-lg text-white shadow-lg flex items-center justify-center space-x-2">
+        
+        <span>香港基本法問答題</span>
       </a>
     </div>
+
   </div>
 
 </body>

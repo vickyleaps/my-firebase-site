@@ -87,7 +87,6 @@
     function generateQuestionBank(type, name) {
       const bank = [];
 
-      // 1. 130 題單選擇題 (乾淨文字，選項無數字前綴)
       for (let i = 1; i <= 130; i++) {
         const correctIndex = Math.floor(Math.random() * 4);
         const answerKey = ['A', 'B', 'C', 'D'][correctIndex];
@@ -114,7 +113,6 @@
         });
       }
 
-      // 2. 70 題複合選擇題 (乾淨文字)
       for (let i = 1; i <= 70; i++) {
         const comboKeys = ['A', 'B', 'C', 'D'];
         const answerKey = comboKeys[Math.floor(Math.random() * comboKeys.length)];
@@ -166,7 +164,7 @@
         status.innerText += `👉 寫入 基本法 (questions_bl)...\n`;
         for (let i = 0; i < blQuestions.length; i++) {
           const q = blQuestions[i];
-          await setDocWithTimeout(doc(docRef => doc(db, "questions_bl", String(q.id))), q);
+          await setDocWithTimeout(doc(db, "questions_bl", String(q.id)), q);
           if ((i + 1) % 20 === 0 || i === blQuestions.length - 1) {
             status.innerText += `   - 基本法進度：${i + 1} / 200 題\n`;
           }
@@ -175,7 +173,7 @@
         status.innerText += `\n👉 寫入 國安法 (questions_nsl)...\n`;
         for (let i = 0; i < nslQuestions.length; i++) {
           const q = nslQuestions[i];
-          await setDocWithTimeout(doc(docRef => doc(db, "questions_nsl", String(q.id))), q);
+          await setDocWithTimeout(doc(db, "questions_nsl", String(q.id)), q);
           if ((i + 1) % 20 === 0 || i === nslQuestions.length - 1) {
             status.innerText += `   - 國安法進度：${i + 1} / 200 題\n`;
           }

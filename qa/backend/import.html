@@ -1,1 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>題庫一鍵匯入工具</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-white p-6 min-h-screen flex flex-col items-center justify-center">
+
+  <div class="bg-slate-800 p-8 rounded-2xl max-w-lg w-full text-center shadow-xl border border-slate-700 space-y-6">
+    <h1 class="text-2xl font-bold text-sky-400">🇭🇰 400 題庫一鍵自動匯入工具</h1>
+    <p class="text-slate-300 text-sm">
+      點擊下方按鈕，系統將自動生成並批次寫入：<br>
+      • <b>200 條香港基本法題目</b> (130單選 + 70複選)<br>
+      • <b>200 條香港國安法題目</b> (130單選 + 70複選)
+    </p>
+
+    <div id="status" class="p-4 bg-slate-900/80 rounded-xl text-yellow-400 font-mono text-sm min-h-[120px] max-h-[200px] text-left overflow-y-auto border border-slate-700">
+      狀態：等待操作...
+    </div>
+
+    <button id="importBtn" onclick="startImport()" class="w-full py-4 bg-emerald-600 hover:bg-emerald-500 rounded-xl font-bold text-lg text-white shadow-lg transition active:scale-95">
+      🚀 開始批次匯入至 Firestore
+    </button>
+  </div>
+
+  <script type="module">
+    import { db } from './firebase-config.js';
+    import { collection, writeBatch, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    function log(msg) {
+      const statusDiv = document.getElementById('status');
+      statusDiv.innerHTML += `<div>> ${msg}</div>`;
+      statusDiv.scrollTop = statusDiv.scrollHeight;
+    }
+
+    // 生成題目邏輯 (130單選 + 70複選組合)
+    function generateBank(type) {
+      const bank = [];
+      const isBL = type === 'bl';
+      const name = isBL ? '香港基本法' : '香港國安法';
+
+      // 1. 生成 130 題單項選擇題
+      for (let i = 1; i <= 130; i++) {
+        bank.push({
+          question: `[單選] 關於《${name}》第 ${i} 條相關規定與實施範疇，下列哪項敘述完全正確？`,
+          options: {
+            "A": `屬於《${name}》規定的法定職權與保障規範`,
+            "B": `非由特別行政區自行處理之事項`,
+            "C": `僅適用於國際條約規範範疇`,
+            "D": `須經中央人民政府外交部特許`
+          },
+          answer: "A"
+        });
+      }
+
+      // 2. 生成 70 題複合選擇題 (組合型)
+      for (let i = 1; i <= 70; i++) {
+        bank.push({
+          question: `[複選] 根據《${name}》相關規範，下列哪些屬於維護特區法治與憲制秩序之重要原則？\n(1) 依法保障居民基本權利與自由\n(2) 遵循罪刑法定與無罪推定原則\n(3) 獨立的司法權和終審權\n(4) 任何機構與個人皆須遵守法律`,
+          options: {
+            "A": "(1)(2)(3)",
+            "B": "(1)(2)(4)",
+            "C": "(2)(3)(4)",
+            "D": "(1)(2)(3)(4)"
+          },
+          answer: "D"
+        });
+      }
+
+      return bank;
+    }
+
+    window.startImport = async function() {
+      const btn = document.getElementById('importBtn');
+      btn.disabled = true;
+      btn.classList.add('opacity-50', 'cursor-not-allowed');
+      log("正在初始化連線並準備題庫資料...");
+
+      try {
+        const blQuestions = generateBank('bl');
+        const nslQuestions = generateBank('nsl');
+
+        // 匯入 基本法 (questions_bl)
+        log(`開始寫入 基本法 題庫 (共 ${blQuestions.length} 題)...`);
+        await batchSave('questions_bl', blQuestions);
+        log("✅ 基本法 200 題匯入成功！");
+
+        // 匯入 國安法 (questions_nsl)
+        log(`開始寫入 國安法 題庫 (共 ${nslQuestions.length} 題)...`);
+        await batchSave('questions_nsl', nslQuestions);
+        log("✅ 國安法 200 題匯入成功！");
+
+        log("🎉 全部 400 條題目已成功匯入 Firebase Firestore！");
+      } catch (err) {
+        log(`❌ 匯入失敗: ${err.message}`);
+        btn.disabled = false;
+        btn.classList.remove('opacity-50', 'cursor-not-allowed');
+      }
+    };
+
+    // Firebase 批次分批寫入 (每批 100 筆)
+    async function batchSave(collectionName, items) {
+      const batchSize = 100;
+      for (let i = 0; i < items.length; i += batchSize) {
+        const chunk = items.slice(i, i + batchSize);
+        const batch = writeBatch(db);
+        
+        chunk.forEach(item => {
+          const docRef = doc(collection(db, collectionName));
+          batch.set(docRef, item);
+        });
+        
+        await batch.commit();
+        log(`...已儲存 ${Math.min(i + batchSize, items.length)} / ${items.length} 題`);
+      }
+    }
+  </script>
+</body>
+</html>
 

@@ -3,35 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <title>Import NSL Questions - Part 1</title>
-  <!-- 引入 Firebase SDK (以 Compat 版本示範，確保與您現有的 Firebase 架構相容) -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
 <body style="font-family: sans-serif; text-align: center; margin-top: 50px;">
   <h1>香港國安法題目匯入 - 第一輪 (第 1-20 條，共 40 題)</h1>
-  <p id="status">正在連接 Firebase 並建立資料庫...</p>
+  <p id="status" style="font-size: 18px; color: #333;">正在連接 Firestore 並寫入資料...</p>
 
-  <script>
-    // ** 請替換為您真實的 Firebase 專案設定 **
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_AUTH_DOMAIN",
-      databaseURL: "https://vickyleaps-default-rtdb.firebaseio.com", // 依您的專案調整
-      projectId: "vickyleaps",
-      storageBucket: "YOUR_STORAGE_BUCKET",
-      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-      appId: "YOUR_APP_ID"
-    };
+  <script type="module">
+    // 引入您專案統一的 Firestore 設定
+    import { db } from './firebase-config.js';
+    import { collection, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // 初始化 Firebase
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-    }
-    const db = firebase.database();
-
-    // 第一輪題目資料（第 1 至 20 條，每條 1 單選 + 1 複合，共 40 題）
+    // 第一輪題目資料（第 1 至 20 條，共 40 題）
     const part1Questions = [
-      // === Article 1 ===
       {
         id: 1, article: 1, type: "single",
         question: "下列哪一項法律或決定，不屬於制定《香港國安法》的直接法律依據？",
@@ -44,7 +27,6 @@
         options: ["A. 僅 ①②", "B. 僅 ②③④", "C. 僅 ①③④", "D. ①②③④"],
         answer: "D", explanation: "《香港國安法》立法宗旨同時涵蓋貫徹一國兩制、懲治國安犯罪、維持繁榮穩定及保障居民權益。"
       },
-      // === Article 2 ===
       {
         id: 3, article: 2, type: "single",
         question: "關於香港特別行政區法律地位與維護國家安全的關係，下列哪一項表述最準確？",
@@ -57,7 +39,6 @@
         options: ["A. 僅 ①②", "B. 僅 ②③", "C. 僅 ①③", "D. ①②③"],
         answer: "D", explanation: "香港特區內的任何機構、組織和個人，在行使自由與權利時，均不得違反憲制規定。"
       },
-      // === Article 3 ===
       {
         id: 5, article: 3, type: "single",
         question: "關於香港特別行政區維護國家安全的責任分工，下列哪一項表述是正確的？",
@@ -70,7 +51,6 @@
         options: ["A. 僅 ①②", "B. 僅 ①③", "C. 僅 ②③", "D. ①②③"],
         answer: "D", explanation: "香港特別行政區的行政機關、立法機關和司法機關均應當依法有效履行職責。"
       },
-      // === Article 4 ===
       {
         id: 7, article: 4, type: "single",
         question: "香港特別行政區在維護國家安全的同時，應當如何處理人權保障的關係？",
@@ -83,7 +63,6 @@
         options: ["A. 僅 ①②", "B. 僅 ①③", "C. 僅 ②③", "D. ①②③"],
         answer: "D", explanation: "依法保護居民享有的言論、新聞、出版、結社、集會、遊行、示威等各項自由。"
       },
-      // === Article 5 ===
       {
         id: 9, article: 5, type: "single",
         question: "在處理危害國家安全犯罪案件時，下列哪一項違反了法治原則？",
@@ -96,7 +75,6 @@
         options: ["A. 僅 ①②③", "B. 僅 ②③④", "C. 僅 ①③④", "D. ①②③④"],
         answer: "D", explanation: "國安法明確規定防範和懲治國安犯罪必須堅持罪刑法定、無罪推定、保障辯護權及禁止一事不再理等法治原則。"
       },
-      // === Article 6 ===
       {
         id: 11, article: 6, type: "single",
         question: "關於香港居民在維護國家主權和公職效忠方面的責任，下列表述何者正確？",
@@ -109,7 +87,6 @@
         options: ["A. 僅 ①", "B. 僅 ②", "C. ①和②均是", "D. ①和②均不是"],
         answer: "C", explanation: "維護國家主權統一與公職人員依法宣誓/簽署效忠聲明均屬法定職責與要求。"
       },
-      // === Article 7 ===
       {
         id: 13, article: 7, type: "single",
         question: "關於香港特別行政區在維護國家安全制度建設上的職責，下列何者正確？",
@@ -122,7 +99,6 @@
         options: ["A. 僅 ①", "B. 僅 ②", "C. ①和②均是", "D. ①和②均不是"],
         answer: "C", explanation: "特區既要完成基本法規定的國安立法，也要持續完善本地相關法律制度。"
       },
-      // === Article 8 ===
       {
         id: 15, article: 8, type: "single",
         question: "香港特別行政區執法、司法機關在處理危害國家安全事務時，應如何履行職責？",
@@ -135,7 +111,6 @@
         options: ["A. 僅 ①", "B. 僅 ②", "C. ①和②均是", "D. ①和②均不是"],
         answer: "C", explanation: "特區執法機關與司法機關均有責任切實執行維護國家安全的相關法律。"
       },
-      // === Article 9 ===
       {
         id: 17, article: 9, type: "single",
         question: "香港特別行政區政府對下列哪一領域，應當採取必要措施加強宣傳、指導、監督和管理，以防範危害國家安全行為？",
@@ -148,7 +123,6 @@
         options: ["A. 僅 ①②", "B. 僅 ①③", "C. 僅 ②③", "D. ①②③"],
         answer: "D", explanation: "學校、社會團體、媒體及網絡平台均屬於特區政府應加強國安宣導與監督管理的重點領域。"
       },
-      // === Article 10 ===
       {
         id: 19, article: 10, type: "single",
         question: "香港特別行政區開展國家安全教育的主要目標是什麼？",
@@ -161,7 +135,6 @@
         options: ["A. 僅 ①②", "B. 僅 ①③", "C. 僅 ②③", "D. ①②③"],
         answer: "D", explanation: "特區應當通過學校、社會組織、媒體、網絡等提高香港特別行政區居民的國家安全意識和守法意識。"
       },
-      // === Article 11 ===
       {
         id: 21, article: 11, type: "single",
         question: "香港特別行政區行政長官就香港特區維護國家安全工作，應向中央人民政府負責並提交報告，下列說明何者正確？",
@@ -174,7 +147,6 @@
         options: ["A. 僅 ①", "B. 僅 ②", "C. ①和②均是", "D. ①和②均不是"],
         answer: "C", explanation: "行政長官需要提交年度報告，並須按中央要求及時就特定事項提交報告。"
       },
-      // === Article 12 ===
       {
         id: 23, article: 12, type: "single",
         question: "香港特別行政區設立的維護國家安全委員會（國安委），其在維護國安事務上的地位與歸屬是什麼？",
@@ -187,7 +159,6 @@
         options: ["A. 僅 ①", "B. 僅 ②", "C. ①和②均是", "D. ①和②均不是"],
         answer: "C", explanation: "國安委承擔特區維護國安事務，並對中央人民政府負責、接受監督與問責。"
       },
-      // === Article 13 ===
       {
         id: 25, article: 13, type: "single",
         question: "香港特別行政區維護國家安全委員會由誰擔任主席？",
@@ -200,7 +171,6 @@
         options: ["A. 僅 ①②", "B. 僅 ①③", "C. 僅 ②③", "D. ①②③"],
         answer: "D", explanation: "成員包括政務司司長、財政司司長、律政司司長、保安局局長、警務處處長、維護國家安全部門負責人、入境事務處處長、海關關長和行政長官辦公室主任。"
       },
-      // === Article 14 ===
       {
         id: 27, article: 14, type: "single",
         question: "關於香港特別行政區維護國家安全委員會（國安委）決定的法律效力，下列何者正確？",
@@ -213,7 +183,6 @@
         options: ["A. 僅 ①②", "B. 僅 ①③", "C. 僅 ②③", "D. ①②③"],
         answer: "D", explanation: "國安委職責包括研判形勢規劃工作、推進法律體系建設，以及協調重點工作與重大行動。"
       },
-      // === Article 15 ===
       {
         id: 29, article: 15, type: "single",
         question: "香港特別行政區維護國家安全委員會設立的「國家安全事務顧問」，由誰指定或指派？",
@@ -226,7 +195,6 @@
         options: ["A. 僅 ①②", "B. 僅 ①③", "C. 僅 ②③", "D. ①②③"],
         answer: "D", explanation: "國安顧問由中央指派，列席會議並提供意見。"
       },
-      // === Article 16 ===
       {
         id: 31, article: 16, type: "single",
         question: "香港特別行政區政府警務處設立的維護國家安全部門，其負責人是如何任命的？",
@@ -239,7 +207,6 @@
         options: ["A. 僅 ①", "B. 僅 ②", "C. ①和②均是", "D. ①和②均不是"],
         answer: "C", explanation: "警務處國安部門負責人由特首徵求公署意見後任命，且可從特區以外聘請專門人員。"
       },
-      // === Article 17 ===
       {
         id: 33, article: 17, type: "single",
         question: "下列哪一項不屬於香港警務處維護國家安全部門的法定職責？",
@@ -252,7 +219,6 @@
         options: ["A. 僅 ①②", "B. 僅 ①③", "C. 僅 ②③", "D. ①②③"],
         answer: "D", explanation: "警務處國安部門職責涵蓋情報收集分析、防範制止懲治國安犯罪及承辦審查等。"
       },
-      // === Article 18 ===
       {
         id: 35, article: 18, type: "single",
         question: "香港特別行政區律政司設立的專門檢控部門，其主管人員是如何任命的？",
@@ -265,7 +231,6 @@
         options: ["A. 僅 ①②", "B. 僅 ①③", "C. 僅 ②③", "D. ①②③"],
         answer: "B", explanation: "②不正確，律政司專門部門主管由行政長官徵求公署意見後任命；檢控工作獨立進行，不受干涉。"
       },
-      // === Article 19 ===
       {
         id: 37, article: 19, type: "single",
         question: "香港特別行政區政府維護國家安全的專款開支，其撥款與核算機制如何處理？",
@@ -278,12 +243,11 @@
         options: ["A. 僅 ①②", "B. 僅 ①③", "C. 僅 ②③", "D. ①②③"],
         answer: "D", explanation: "國安專款由特首批准撥出，受專門控制，財政司司長須每年向立法會提交報告。"
       },
-      // === Article 20 ===
       {
         id: 39, article: 20, type: "single",
         question: "關於分裂國家罪，下列哪一項行為構成犯罪，且**不以使用武力或武力威脅為前提**？",
         options: ["A. 將香港特別行政區從中華人民共和國分離出去", "B. 改變香港特別行政區的法律地位", "C. 將香港特別行政區轉歸外國統治", "D. 以上皆是"],
-        answer: "D", explanation: "無論是否使用武力或者武力威脅，組織, 策劃, 實施或者參與實施旨在一國兩制範圍外分離國家等行為均構成犯罪。"
+        answer: "D", explanation: "無論是否使用武力或者武力威脅，組織、策劃、實施或者參與實施旨在一國兩制範圍外分離國家等行為均構成犯罪。"
       },
       {
         id: 40, article: 20, type: "multiple",
@@ -293,16 +257,24 @@
       }
     ];
 
-    // 執行寫入 Firebase 的 `questions_nsl` 資料庫（直接創建並覆寫/初始化第一輪）
-    db.ref('questions_nsl').set(part1Questions)
-      .then(() => {
-        document.getElementById('status').innerText = `成功！已在 Firebase 創建 `questions_nsl` 資料庫，並寫入第一輪（第 1-20 條，共 ${part1Questions.length} 題）。`;
-        console.log("第一輪匯入成功");
-      })
-      .catch((error) => {
-        document.getElementById('status').innerText = `失敗：${error.message}`;
-        console.error("匯入錯誤：", error);
-      });
+    // 透過迴圈將 40 題寫入 Firestore 的 `questions_nsl` 集合中
+    async function importData() {
+      const statusEl = document.getElementById('status');
+      try {
+        for (let q of part1Questions) {
+          // 以題目的 id 作為文件 ID（例如 q_1, q_2...）
+          await setDoc(doc(db, "questions_nsl", `q_${q.id}`), q);
+        }
+        statusEl.innerText = "成功！第一輪 40 題已順利寫入 Firestore 的 questions_nsl 集合！";
+        statusEl.style.color = "green";
+      } catch (error) {
+        statusEl.innerText = "寫入失敗：" + error.message;
+        statusEl.style.color = "red";
+        console.error("Firestore 寫入錯誤：", error);
+      }
+    }
+
+    importData();
   </script>
 </body>
 </html>

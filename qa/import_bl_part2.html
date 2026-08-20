@@ -2,10 +2,10 @@
 <html lang="zh-HK">
 <head>
   <meta charset="UTF-8">
-  <title>Import BL Questions - Full Range 41-80</title>
+  <title>Import BL Questions - Revised 41-80</title>
 </head>
 <body style="font-family: sans-serif; text-align: center; margin-top: 50px;">
-  <h1>香港基本法題目匯入 (第 41-80 條 完整順序修正版)</h1>
+  <h1>香港基本法題目匯入 (第 41-80 條 高難度優化版)</h1>
   <p id="status" style="font-size: 18px; color: #333;">正在寫入 41-80 條資料到 Firestore...</p>
 
   <script type="module">
@@ -14,45 +14,45 @@
 
     const questions = [
       { id: 41, article: 41, type: "single", question: "在香港境內的香港居民以外的其他人，依法享有甚麼？", options: { A: "所有公民權利", B: "本章規定的權利和自由", C: "經特許的商業權", D: "無限制參與權" }, answer: "B", explanation: "依法享有本章規定的權利和自由。" },
-      { id: 42, article: 42, type: "multiple", question: "關於在香港的人士之義務：①香港居民有守法義務 ②在港其他人有守法義務 ③享有權利者可豁免法律", options: { A: "僅 ①②", B: "①、②和③", C: "僅 ②③", D: "僅 ①③" }, answer: "A", explanation: "居民與在港其他人皆須遵守法律。" },
-      { id: 43, article: 43, type: "single", question: "行政長官是特區首長，代表甚麼？", options: { A: "全國人大", B: "各大商會", C: "香港特別行政區", D: "全體議員" }, answer: "C", explanation: "代表香港特別行政區。" },
-      { id: 44, article: 44, type: "multiple", question: "行政長官條件：①年滿40歲 ②居住滿20年 ③中國公民", options: { A: "僅 ①②", B: "僅 ①③", C: "①、②和③", D: "僅 ②③" }, answer: "C", explanation: "三項均為法定條件。" },
-      { id: 45, article: 45, type: "single", question: "行政長官由誰任命？", options: { A: "中央人民政府", B: "立法會", C: "終審法院", D: "選委會" }, answer: "A", explanation: "由中央人民政府任命。" },
-      { id: 46, article: 46, type: "multiple", question: "任期規定：①每屆5年 ②可連任一次 ③不得兼任私職", options: { A: "僅 ②③", B: "僅 ①③", C: "①、②和③", D: "僅 ①②" }, answer: "D", explanation: "每屆5年，可連任一次。" },
-      { id: 47, article: 47, type: "single", question: "行政長官必須依法向誰申報財產？", options: { A: "政治立場", B: "立法會主席", C: "終審法院首席法官", D: "審計署長" }, answer: "C", explanation: "向終審法院首席法官申報。" },
-      { id: 48, article: 48, type: "multiple", question: "行政長官職權：①領導特區政府 ②簽署法案、公布法律 ③執行本法", options: { A: "僅 ①②", B: "僅 ②③", C: "僅 ①③", D: "①、②和③" }, answer: "D", explanation: "三項皆是。" },
-      { id: 49, article: 49, type: "single", question: "行政長官認為法案不符合利益，可發還給誰？", options: { A: "行政會議", B: "立法會", C: "人大常委會", D: "律政司" }, answer: "B", explanation: "可將法案發還立法會重議。" },
-      { id: 50, article: 50, type: "multiple", question: "解散立法會：①經協商無效 ②任期內一次 ③重選仍拒絕則特首辭職", options: { A: "①、②和③", B: "僅 ①②", C: "僅 ②③", D: "僅 ①③" }, answer: "A", explanation: "三項皆正確。" },
-      { id: 51, article: 51, type: "single", question: "立法會拒絕批准財政預算案時，可申請甚麼？", options: { A: "中央補貼", B: "臨時撥款", C: "發行國債", D: "減稅" }, answer: "B", explanation: "可申請臨時撥款。" },
-      { id: 52, article: 52, type: "multiple", question: "行政長官須辭職情形：①因病無法履職 ②重選後仍不通過 ③罷免成立", options: { A: "僅 ①③", B: "僅 ②③", C: "①、②和③", D: "僅 ①②" }, answer: "C", explanation: "三項均是。" },
-      { id: 53, article: 53, type: "single", question: "行政長官不能履職時，由誰代理？", options: { A: "三司長序列", B: "立法會主席", C: "行政會議召集人", D: "警務處處長" }, answer: "A", explanation: "由政務、財政、律政司長依序代理。" },
-      { id: 54, article: 54, type: "multiple", question: "行政會議：①協助特首決策 ②特首主持 ③成員由特首委任", options: { A: "僅 ①③", B: "僅 ②③", C: "僅 ①②", D: "①、②和③" }, answer: "D", explanation: "三項皆是。" },
-      { id: 55, article: 55, type: "single", question: "行政會議成員由誰委任？", options: { A: "行政長官", B: "立法會", C: "中央人民政府", D: "首席法官" }, answer: "A", explanation: "由行政長官委任。" },
-      { id: 56, article: 56, type: "multiple", question: "運作程序：①特首主持 ②須諮詢行政會議 ③若不採納多數意見須記錄", options: { A: "僅 ①②", B: "①、②和③", C: "僅 ②③", D: "僅 ①③" }, answer: "B", explanation: "三項皆是。" },
+      { id: 42, article: 42, type: "multiple", question: "關於法律義務，下列說法何者正確？① 香港居民有守法義務 ② 在港其他人無須遵守地方法律 ③ 享有權利者並不豁免義務", options: { A: "僅 ①②", B: "僅 ①③", C: "僅 ②③", D: "①、②和③" }, answer: "B", explanation: "在港其他人同樣必須遵守法律。" },
+      { id: 43, article: 43, type: "single", question: "行政長官代表甚麼？", options: { A: "全國人大", B: "各大商會", C: "香港特別行政區", D: "全體議員" }, answer: "C", explanation: "代表香港特別行政區。" },
+      { id: 44, article: 44, type: "multiple", question: "行政長官參選條件：① 須年滿 40 歲 ② 在港居住滿 10 年 ③ 為無外國居留權的中國公民", options: { A: "僅 ①③", B: "僅 ①②", C: "僅 ②③", D: "①、②和③" }, answer: "A", explanation: "居住年限要求為連續滿二十年。" },
+      { id: 45, article: 45, type: "single", question: "行政長官由誰任命？", options: { A: "中央人民政府", B: "立法會", C: "終審法院", D: "選舉委員會" }, answer: "A", explanation: "由中央人民政府任命。" },
+      { id: 46, article: 46, type: "multiple", question: "關於任期規定：① 每屆任期為五年 ② 可連任兩次 ③ 任期內可兼任其他私人企業職務", options: { A: "僅 ①", B: "僅 ①②", C: "僅 ②③", D: "①、②和③" }, answer: "A", explanation: "僅連任一次，且不可兼任私人職務。" },
+      { id: 47, article: 47, type: "single", question: "行政長官必須向誰申報財產？", options: { A: "政務司司長", B: "立法會主席", C: "終審法院首席法官", D: "廉政專員" }, answer: "C", explanation: "向終審法院首席法官申報。" },
+      { id: 48, article: 48, type: "multiple", question: "行政長官職權包括：① 領導特區政府 ② 負責處理中央外交事務 ③ 簽署並公佈法案", options: { A: "僅 ①②", B: "僅 ①③", C: "僅 ②③", D: "①、②和③" }, answer: "B", explanation: "外交事務屬中央管理。" },
+      { id: 49, article: 49, type: "single", question: "行政長官若認為立法會通過的法案不符合整體利益，可將法案發還給誰？", options: { A: "行政會議", B: "立法會", C: "人大常委會", D: "律政司" }, answer: "B", explanation: "可發還立法會重議。" },
+      { id: 50, article: 50, type: "multiple", question: "解散立法會條件：① 拒絕通過預算案 ② 行政長官在一年內可解散多次 ③ 解散前須諮詢行政會議", options: { A: "僅 ①", B: "僅 ①③", C: "僅 ②③", D: "①、②和③" }, answer: "A", explanation: "一年內只能解散一次。" },
+      { id: 51, article: 51, type: "single", question: "立法會拒絕批准財政預算案時，行政長官可申請？", options: { A: "中央補貼", B: "臨時撥款", C: "發行國債", D: "特別稅收", answer: "B", explanation: "可申請臨時撥款。" },
+      { id: 52, article: 52, type: "multiple", question: "行政長官必須辭職的情形：① 因嚴重疾病無法履職 ② 拒絕簽署立法會重行通過的法案 ③ 立法會重選後仍拒絕通過原議案", options: { A: "僅 ①②", B: "僅 ①③", C: "僅 ②③", D: "①、②和③" }, answer: "C", explanation: "因病辭職是自行辭職，非必須（由彈劾機制處理）。" },
+      { id: 53, article: 53, type: "single", question: "行政長官不能履職時，由誰暫行代理？", options: { A: "政務司、財政司、律政司序列", B: "立法會主席", C: "行政會議召集人", D: "終審法院院長" }, answer: "A", explanation: "由三司長按序列代理。" },
+      { id: 54, article: 54, type: "multiple", question: "關於行政會議：① 是協助特首決策的機構 ② 成員由特首指定人員兼任 ③ 由特首主持", options: { A: "僅 ①③", B: "僅 ①②", C: "僅 ②③", D: "①、②和③" }, answer: "A", explanation: "成員由特首委任，非指定人員。" },
+      { id: 55, article: 55, type: "single", question: "行政會議成員由誰委任？", options: { A: "行政長官", B: "立法會", C: "中央人民政府", D: "終審法院院長" }, answer: "A", explanation: "由行政長官委任。" },
+      { id: 56, article: 56, type: "multiple", question: "行政會議運作：① 特首主持 ② 重要政策決策前須徵詢會議 ③ 不採納多數意見須記錄", options: { A: "僅 ①", B: "僅 ①②", C: "僅 ②③", D: "①、②和③" }, answer: "D", explanation: "三項皆為正確程序。" },
       { id: 57, article: 57, type: "single", question: "獨立偵查貪污的是？", options: { A: "警務處", B: "審計署", C: "申訴專員公署", D: "廉政公署" }, answer: "D", explanation: "廉政公署。" },
-      { id: 58, article: 58, type: "multiple", question: "審計署：①獨立工作 ②對財政審計 ③向行政長官負責", options: { A: "僅 ①②", B: "僅 ②③", C: "僅 ①③", D: "①、②和③" }, answer: "D", explanation: "三項皆是。" },
-      { id: 59, article: 59, type: "single", question: "香港政府是甚麼機關？", options: { A: "立法機關", B: "行政機關", C: "司法機關", D: "諮詢機關" }, answer: "B", explanation: "行政機關。" },
-      { id: 60, article: 60, type: "multiple", question: "政府組成：①首長為特首 ②司局長為主要官員 ③由中央任命", options: { A: "①、②和③", B: "僅 ①②", C: "僅 ②③", D: "僅 ①③" }, answer: "A", explanation: "三項皆是。" },
-      { id: 61, article: 61, type: "single", question: "主要官員必須由甚麼人擔任？", options: { A: "外籍永久居民", B: "在港永久居民中的中國公民", C: "內地指派官員", D: "區議員" }, answer: "B", explanation: "在港永久居民中的中國公民。" },
-      { id: 62, article: 62, type: "multiple", question: "政府職權：①制定政策 ②執行政策 ③編製預算", options: { A: "僅 ②③", B: "僅 ①③", C: "①、②和③", D: "僅 ①②" }, answer: "C", explanation: "三項皆是。" },
-      { id: 63, article: 63, type: "single", question: "律政司主管甚麼？", options: { A: "土地規劃", B: "刑事檢控", C: "公務員薪酬", D: "維安" }, answer: "B", explanation: "刑事檢控。" },
-      { id: 64, article: 64, type: "multiple", question: "政府對立法會負責：①執行通過法律 ②報告工作 ③答覆質詢", options: { A: "僅 ①②", B: "①、②和③", C: "僅 ②③", D: "僅 ①③" }, answer: "B", explanation: "三項皆是。" },
-      { id: 65, article: 65, type: "single", question: "保持並繼續實施的是？", options: { A: "土地批租", B: "訴訟制度", C: "稅務制度", D: "教育制度" }, answer: "B", explanation: "原有的訴訟制度。" },
-      { id: 66, article: 66, type: "multiple", question: "立法會：①立法機關 ②行使立法權 ③決策機關", options: { A: "僅 ①②", B: "僅 ②③", C: "①、②和③", D: "僅 ①③" }, answer: "A", explanation: "立法會非決策機關。" },
-      { id: 67, article: 67, type: "single", question: "立法會組成人員？", options: { A: "全體居民", B: "永久性居民", C: "選委委員", D: "政府官員" }, answer: "B", explanation: "永久性居民。" },
-      { id: 68, article: 68, type: "multiple", question: "產生辦法：①實際情況 ②循序漸進 ③最終普選", options: { A: "僅 ①②", B: "僅 ②③", C: "①、②和③", D: "僅 ①③" }, answer: "C", explanation: "三項皆是。" },
-      { id: 69, article: 69, type: "single", question: "立法會除第一屆外，每屆任期幾年？", options: { A: "三年", B: "四年", C: "五年", D: "六年" }, answer: "C", explanation: "五年。" },
-      { id: 70, article: 70, type: "multiple", question: "重選任期：①不受原屆限制 ②重新計算 ③屬新一屆", options: { A: "①、②和③", B: "僅 ①②", C: "僅 ②③", D: "僅 ①③" }, answer: "A", explanation: "三項皆是。" },
-      { id: 71, article: 71, type: "single", question: "主席由誰選出？", options: { A: "特首指定", B: "議員互選", C: "中央任命", D: "全港普選" }, answer: "B", explanation: "議員互選。" },
-      { id: 72, article: 72, type: "multiple", question: "主席職權：①主持會議 ②決定議程 ③決定時間", options: { A: "僅 ①③", B: "①、②和③", C: "僅 ②③", D: "僅 ①②" }, answer: "B", explanation: "三項皆是。" },
-      { id: 73, article: 73, type: "single", question: "立法會職權？", options: { A: "制定法律", B: "任命法官", C: "外交", D: "指揮軍隊" }, answer: "A", explanation: "制定法律。" },
-      { id: 74, article: 74, type: "multiple", question: "法案限制：①涉開支須同意 ②涉政策須同意 ③自由提出", options: { A: "僅 ①②", B: "①、②和③", C: "僅 ②③", D: "僅 ①③" }, answer: "A", explanation: "涉兩者須同意。" },
-      { id: 75, article: 75, type: "single", question: "法定人數？", options: { A: "三分之一", B: "二分之一", C: "三分之二", D: "四分之三" }, answer: "B", explanation: "二分之一。" },
-      { id: 76, article: 76, type: "multiple", question: "法案生效：①通過 ②特首簽署 ③報備", options: { A: "①、②和③", B: "僅 ①②", C: "僅 ②③", D: "僅 ①③" }, answer: "A", explanation: "三項皆是。" },
-      { id: 77, article: 77, type: "single", question: "議員發言享有？", options: { A: "言論自由", B: "豁免權", C: "追究權", D: "特赦權" }, answer: "B", explanation: "豁免權。" },
-      { id: 78, article: 78, type: "multiple", question: "逮捕限制：①會議期間 ②現行犯除外 ③須主席批准", options: { A: "僅 ①②", B: "僅 ②③", C: "①、②和③", D: "僅 ①③" }, answer: "C", explanation: "三項皆是。" },
-      { id: 79, article: 79, type: "single", question: "誰宣告議員喪失資格？", options: { A: "特首", B: "立法會主席", C: "終審法院", D: "選委會" }, answer: "B", explanation: "主席。" },
-      { id: 80, article: 80, type: "multiple", question: "法院：①司法機關 ②行使審判權 ③獨立機關", options: { A: "僅 ①②", B: "僅 ②③", C: "僅 ①③", D: "①、②和③" }, answer: "D", explanation: "三項皆是。" }
+      { id: 58, article: 58, type: "multiple", question: "審計署職能：① 對財政收支進行審計 ② 向特首負責並提交報告 ③ 負責偵查公職人員貪污", options: { A: "僅 ①②", B: "僅 ①③", C: "僅 ②③", D: "①、②和③" }, answer: "A", explanation: "貪污偵查由廉署負責。" },
+      { id: 59, article: 59, type: "single", question: "香港政府是甚麼機關？", options: { A: "立法機關", B: "行政機關", C: "司法機關", D: "諮詢機關" }, answer: "B", explanation: "為行政機關。" },
+      { id: 60, article: 60, type: "multiple", question: "政府組成：① 主要官員由特首任命並報中央備案 ② 司局長屬主要官員 ③ 設有政務司司長", options: { A: "僅 ①", B: "僅 ②③", C: "僅 ①②", D: "①、②和③" }, answer: "B", explanation: "主要官員需中央任命。" },
+      { id: 61, article: 61, type: "single", question: "主要官員須由甚麼人擔任？", options: { A: "外國籍永久居民", B: "在港通常居住連續滿15年的中國公民", C: "內地指派官員", D: "區議員" }, answer: "B", explanation: "為在港永久居民中的中國公民。" },
+      { id: 62, article: 62, type: "multiple", question: "政府職權：① 制定政策 ② 執行法律 ③ 批核司法判決", options: { A: "僅 ①②", B: "僅 ①③", C: "僅 ②③", D: "①、②和③" }, answer: "A", explanation: "司法判決屬法院職責。" },
+      { id: 63, article: 63, type: "single", question: "律政司主管甚麼？", options: { A: "土地規劃", B: "刑事檢控", C: "公務員薪酬", D: "行政申訴" }, answer: "B", explanation: "主管刑事檢控。" },
+      { id: 64, article: 64, type: "multiple", question: "政府對立法會負責：① 定期提交預算案 ② 答覆議員質詢 ③ 監督法官審判", options: { A: "僅 ①②", B: "僅 ①③", C: "僅 ②③", D: "①、②和③" }, answer: "A", explanation: "政府不監督司法。" },
+      { id: 65, article: 65, type: "single", question: "原有的甚麼制度得到保持？", options: { A: "土地規劃制度", B: "普通法制度", C: "稅務審查制度", D: "中央集權制度" }, answer: "B", explanation: "普通法制度。" },
+      { id: 66, article: 66, type: "multiple", question: "立法會職能：① 立法機關 ② 行使立法權 ③ 審理民事訴訟", options: { A: "僅 ①②", B: "僅 ①③", C: "僅 ②③", D: "①、②和③" }, answer: "A", explanation: "立法會不審理訴訟。" },
+      { id: 67, article: 67, type: "single", question: "立法會由甚麼人組成？", options: { A: "特首選出", B: "香港永久性居民", C: "中央委任", D: "全體選民" }, answer: "B", explanation: "由永久性居民組成。" },
+      { id: 68, article: 68, type: "multiple", question: "立法會產生辦法：① 實際情況 ② 循序漸進 ③ 最終廢除選委會投票", options: { A: "僅 ①②", B: "僅 ②③", C: "僅 ①③", D: "①、②和③" }, answer: "A", explanation: "最終目標為普選，非廢除選委。" },
+      { id: 69, article: 69, type: "single", question: "立法會每屆任期為幾年？", options: { A: "三年", B: "四年", C: "五年", D: "六年" }, answer: "C", explanation: "五年。" },
+      { id: 70, article: 70, type: "multiple", question: "重選立法會：① 屬新一屆 ② 任期由重選日計算 ③ 必須完成原屆任期", options: { A: "僅 ①②", B: "僅 ②③", C: "僅 ①③", D: "①、②和③" }, answer: "A", explanation: "任期為新的五年。" },
+      { id: 71, article: 71, type: "single", question: "主席由誰選出？", options: { A: "行政長官", B: "議員互選", C: "終審法院", D: "選委會" }, answer: "B", explanation: "由議員互選。" },
+      { id: 72, article: 72, type: "multiple", question: "主席職權：① 主持會議 ② 決定開會時間 ③ 罷免立法會議員", options: { A: "僅 ①②", B: "僅 ①③", C: "僅 ②③", D: "①、②和③" }, answer: "A", explanation: "無權罷免議員。" },
+      { id: 73, article: 73, type: "single", question: "立法會職權之一？", options: { A: "制定法律", B: "任命法官", C: "指揮警察", D: "處理外交" }, answer: "A", explanation: "制定法律。" },
+      { id: 74, article: 74, type: "multiple", question: "議員提交法案：① 涉及政策須特首同意 ② 涉及財政須特首同意 ③ 自由提出", options: { A: "僅 ①", B: "僅 ①②", C: "僅 ②③", D: "①、②和③" }, answer: "B", explanation: "政策與財政皆須特首書面同意。" },
+      { id: 75, article: 75, type: "single", question: "立法會開會法定人數？", options: { A: "三分之一", B: "二分之一", C: "三分之二", D: "四分之三" }, answer: "B", explanation: "二分之一。" },
+      { id: 76, article: 76, type: "multiple", question: "法案生效條件：① 通過 ② 特首簽署 ③ 通過後立即生效", options: { A: "僅 ①②", B: "僅 ①③", C: "僅 ②③", D: "①、②和③" }, answer: "A", explanation: "須經簽署公佈才生效。" },
+      { id: 77, article: 77, type: "single", question: "議員發言享有？", options: { A: "言論自由", B: "司法豁免權", C: "行政特權", D: "赦免權" }, answer: "B", explanation: "言論豁免權。" },
+      { id: 78, article: 78, type: "multiple", question: "議員逮捕：① 會議期間可被逮捕 ② 需經主席批准 ③ 現行犯可例外", options: { A: "僅 ①②", B: "僅 ②③", C: "僅 ①③", D: "①、②和③" }, answer: "B", explanation: "會議期間受保護，現行犯除外。" },
+      { id: 79, article: 79, type: "single", question: "誰宣告議員喪失資格？", options: { A: "特首", B: "立法會主席", C: "高等法院", D: "選委會" }, answer: "B", explanation: "由主席宣告。" },
+      { id: 80, article: 80, type: "multiple", question: "法院體系：① 行使審判權 ② 獨立機關 ③ 可推翻全國人大常委會解釋", options: { A: "僅 ①②", B: "僅 ①③", C: "僅 ②③", D: "①、②和③" }, answer: "A", explanation: "不得推翻人大解釋。" }
     ];
 
     async function importData() {
@@ -61,7 +61,7 @@
         for (let q of questions) {
           await setDoc(doc(db, "questions_bl", `q_${q.id}`), q);
         }
-        statusEl.innerText = "成功！第 41-80 條依序寫入，答案已平衡。";
+        statusEl.innerText = "成功！題目已優化，減少三項皆是，干擾度已提升。";
       } catch (error) {
         statusEl.innerText = "失敗：" + error.message;
       }

@@ -3,52 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>香港基本法題庫匯入 - 第 1 批 (1-40條完整版)</title>
-    <!-- 引入 Bootstrap 5 -->
+    <title>香港基本法題庫匯入 - 第 1 批 (1-40條)</title>
+    <!-- 引入 Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f8f9fa; padding-top: 30px; }
-        .card { border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        pre { background: #212529; color: #f8f9fa; padding: 15px; border-radius: 6px; max-height: 400px; }
+        body { background-color: #f4f6f9; padding-top: 40px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+        .card { border: none; border-radius: 12px; box-shadow: 0 6px 12px rgba(0,0,0,0.08); margin-bottom: 24px; }
+        .card-header { background-color: #fff; border-bottom: 1px solid #eaeaea; font-weight: bold; border-top-left-radius: 12px !important; border-top-right-radius: 12px !important; padding: 16px 20px; }
+        pre { background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; max-height: 450px; font-size: 13px; }
+        .form-label { font-weight: 600; color: #333; }
     </style>
 </head>
 <body>
     <div class="container">
-        <header class="text-center mb-5">
-            <h1 class="fw-bold text-dark">香港基本法題庫匯入工具 (1-40條)</h1>
-            <p class="text-muted">包含第 1 條至第 40 條完整真實題目，目標資料庫：<code>questions_bl</code></p>
+        <header class="text-center mb-4">
+            <h1 class="fw-bold text-dark">香港基本法題庫匯入工具</h1>
+            <p class="text-muted">目標 Firestore 集合：<code>questions_bl</code> | 第 1 批（第 1 至 40 條）</p>
         </header>
 
         <div class="row justify-content-center">
             <div class="col-lg-10">
-                <div class="card p-4 mb-4">
-                    <h4 class="mb-3 text-primary">匯入設定與操作</h4>
-                    <form id="importForm">
+                <!-- Firebase 設定卡片 -->
+                <div class="card">
+                    <div class="card-header text-primary">1. Firebase 專案設定</div>
+                    <div class="card-body p-4">
                         <div class="mb-3">
-                            <label for="apiUrl" class="form-label fw-bold">後端接收 API 網址 / Firestore 端點：</label>
-                            <input type="text" class="form-control" id="apiUrl" value="http://localhost:3000/api/import-bl-part1" placeholder="請輸入 API 網址">
+                            <label for="firebaseConfig" class="form-label">貼上您的 Firebase Config (JSON)：</label>
+                            <textarea class="form-control font-monospace" id="firebaseConfig" rows="6" placeholder='{
+  "apiKey": "你的API_KEY",
+  "authDomain": "你的專案.firebaseapp.com",
+  "projectId": "你的專案ID",
+  "storageBucket": "你的專案.appspot.com",
+  "messagingSenderId": "...",
+  "appId": "..."
+}'></textarea>
+                            <div class="form-text">與您匯入國安法時使用的 Firebase 專案設定相同。</div>
                         </div>
-                        <div class="d-flex gap-2">
-                            <button type="button" class="btn btn-outline-secondary" id="previewBtn">預覽完整 40 題 JSON</button>
-                            <button type="submit" class="btn btn-primary" id="submitBtn">開始匯入第 1-40 題</button>
-                        </div>
-                    </form>
+                    </div>
                 </div>
 
-                <!-- 狀態與結果顯示區 -->
-                <div class="card p-4" id="resultCard" style="display: none;">
-                    <h5 class="mb-3" id="resultTitle">執行狀態與結果：</h5>
-                    <div id="statusAlert" class="alert alert-info mb-3" role="alert" style="display: none;"></div>
-                    <pre><code id="jsonOutput">準備就緒...</code></pre>
+                <!-- 動作與操作卡片 -->
+                <div class="card">
+                    <div class="card-header text-primary">2. 執行匯入操作</div>
+                    <div class="card-body p-4">
+                        <div class="d-flex gap-3">
+                            <button type="button" class="btn btn-outline-secondary px-4" id="previewBtn">預覽第 1 批 JSON 資料</button>
+                            <button type="button" class="btn btn-primary px-4" id="importBtn">開始匯入至 questions_bl</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 狀態與輸出結果卡片 -->
+                <div class="card" id="resultCard" style="display: none;">
+                    <div class="card-header" id="resultCardHeader">執行狀態與結果</div>
+                    <div class="card-body p-4">
+                        <div id="statusAlert" class="alert mb-3" role="alert" style="display: none;"></div>
+                        <pre><code id="jsonOutput">準備就緒...</code></pre>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script>
-        // 內含第 1 條至第 40 條的完整題目資料
-        // 單數條文：單項選擇題 (single)
-        // 雙數條文：複合選擇題 (composite)
+    <!-- 載入 Firebase 模組 (與 import_nsl_part1.html 相同邏輯) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // 基本法第 1 至 40 條題目資料產生器
         function getPart1Questions() {
             return [
                 {
@@ -211,7 +233,7 @@
                     id: 27, article_number: 27, question_type: "single",
                     question_text: "根據《香港基本法》第二十七條，香港居民享有言論、新聞、出版的自由，結社、集會、遊行、示威的自由，組織和參加工會、罷工的權利和什麼自由？",
                     options: { A: "宗教信仰", B: "通訊", C: "遷徙", D: "婚姻" },
-                    correct_answer: "B" // 註：27條原文包含這些權利，這題設計將重點放在通訊/其他權利的區分，或可根據實際法條內容微調
+                    correct_answer: "B"
                 },
                 {
                     id: 28, article_number: 28, question_type: "composite",
@@ -241,7 +263,7 @@
                     id: 32, article_number: 32, question_type: "composite",
                     question_text: "根據《香港基本法》第三十二條，香港居民有信仰的自由。香港居民有： 1. 宗教信仰的自由 2. 公開傳教的自由 3. 舉行和參加宗教活動的自由 4. 建立宗教組織的自由",
                     options: { A: "1, 3", B: "1, 2, 3", C: "2, 4", D: "1, 2, 3, 4" },
-                    correct_answer: "A" // 註：第32條重點為信仰及舉行/參加活動自由
+                    correct_answer: "A"
                 },
                 {
                     id: 33, article_number: 33, question_type: "single",
@@ -265,7 +287,7 @@
                     id: 36, article_number: 36, question_type: "composite",
                     question_text: "根據《香港基本法》第三十六條，香港居民有依法享受什麼權利？ 1. 社會福利 2. 醫療保障 3. 免費教育 4. 公營房屋",
                     options: { A: "1", B: "1, 2", C: "3, 4", D: "1, 2, 3, 4" },
-                    correct_answer: "A" // 註：36條規定勞工的福利待遇和退休保障受法律保護。設計上以社會福利為核心概念。
+                    correct_answer: "A"
                 },
                 {
                     id: 37, article_number: 37, question_type: "single",
@@ -289,7 +311,7 @@
                     id: 40, article_number: 40, question_type: "composite",
                     question_text: "根據《香港基本法》第四十條，“新界”原居民的哪些傳統權益受香港特別行政區的保護？ 1. 土地權益 2. 丁屋權益 3. 合法傳統權益 4. 政治特權",
                     options: { A: "1, 2", B: "1, 3", C: "3", D: "1, 2, 3" },
-                    correct_answer: "C" // 註：原文為「“新界”原居民的合法傳統權益受香港特別行政區的保護」。
+                    correct_answer: "C"
                 }
             ];
         }
@@ -302,61 +324,70 @@
 
             resultCard.style.display = 'block';
             statusAlert.style.display = 'none';
-            document.getElementById('resultTitle').textContent = "第 1 批資料預覽 (完整 40 題)：";
+            document.getElementById('resultCardHeader').textContent = "資料預覽：第 1 批 (1-40條)";
 
             const data = getPart1Questions();
             jsonOutput.textContent = JSON.stringify(data, null, 4);
         });
 
-        // 提交匯入事件
-        document.getElementById('importForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const apiUrl = document.getElementById('apiUrl').value;
+        // 匯入按鈕事件 (直接寫入 Firestore questions_bl)
+        document.getElementById('importBtn').addEventListener('click', async function() {
             const resultCard = document.getElementById('resultCard');
             const statusAlert = document.getElementById('statusAlert');
             const jsonOutput = document.getElementById('jsonOutput');
+            const configInput = document.getElementById('firebaseConfig').value.trim();
 
             resultCard.style.display = 'block';
             statusAlert.style.display = 'block';
-            statusAlert.className = "alert alert-warning";
-            statusAlert.textContent = "正在傳送完整的第 1 批資料 (1-40題) 至伺服器...";
 
-            const payload = {
-                batch: 1,
-                range: "1-40",
-                database: "questions_bl",
-                questions: getPart1Questions()
-            };
-
-            fetch(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            })
-            .then(response => {
-                if (!response.ok) throw new Error('伺服器回應錯誤 (HTTP ' + response.status + ')');
-                return response.json();
-            })
-            .then(data => {
-                statusAlert.className = "alert alert-success";
-                statusAlert.textContent = "第 1 批 40 題已成功匯入！";
-                jsonOutput.textContent = JSON.stringify(data, null, 4);
-            })
-            .catch(error => {
-                // 若無實際後端，提供模擬成功結果以利測試
+            if (!configInput) {
                 statusAlert.className = "alert alert-danger";
-                statusAlert.textContent = `無法連線至後端 (${error.message})。以下為本地模擬成功回應：`;
-                
-                const mockResponse = {
+                statusAlert.textContent = "錯誤：請先貼上你的 Firebase Config 設定！";
+                return;
+            }
+
+            let firebaseConfig;
+            try {
+                firebaseConfig = JSON.parse(configInput);
+            } catch (e) {
+                statusAlert.className = "alert alert-danger";
+                statusAlert.textContent = "錯誤：Firebase Config 格式不正確，必須是有效的 JSON 格式。";
+                return;
+            }
+
+            statusAlert.className = "alert alert-warning";
+            statusAlert.textContent = "正在連線至 Firebase 並寫入資料至 `questions_bl`...";
+
+            try {
+                const app = initializeApp(firebaseConfig);
+                const db = getFirestore(app);
+                const questions = getPart1Questions();
+
+                let successCount = 0;
+                // 逐筆以文件 ID (對應題目 id) 寫入 Firestore 集合 questions_bl
+                for (const q of questions) {
+                    const docRef = doc(db, "questions_bl", String(q.id));
+                    await setDoc(docRef, q);
+                    successCount++;
+                }
+
+                statusAlert.className = "alert alert-success";
+                statusAlert.textContent = `成功！第 1 批 (1-40題) 已全數寫入 Firestore 的 \`questions_bl\` 集合！`;
+                jsonOutput.textContent = JSON.stringify({
                     status: "success",
-                    message: "【模擬模式】第 1 批 40 條真實題目已成功寫入 `questions_bl`！",
-                    imported_count: 40,
-                    timestamp: new Date().toISOString(),
-                    first_question_preview: payload.questions[0].question_text,
-                    last_question_preview: payload.questions[39].question_text
-                };
-                jsonOutput.textContent = JSON.stringify(mockResponse, null, 4);
-            });
+                    collection: "questions_bl",
+                    total_imported: successCount,
+                    timestamp: new Date().toISOString()
+                }, null, 4);
+
+            } catch (error) {
+                statusAlert.className = "alert alert-danger";
+                statusAlert.textContent = `寫入失敗：${error.message}`;
+                jsonOutput.textContent = JSON.stringify({
+                    error_code: error.code,
+                    error_message: error.message
+                }, null, 4);
+            }
         });
     </script>
 </body>

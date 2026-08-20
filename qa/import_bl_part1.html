@@ -2,11 +2,11 @@
 <html lang="zh-HK">
 <head>
   <meta charset="UTF-8">
-  <title>Import BL Questions - Part 1</title>
+  <title>Import BL Questions - Part 1 (1-40)</title>
 </head>
 <body style="font-family: sans-serif; text-align: center; margin-top: 50px;">
   <h1>香港基本法題目匯入 - 第一輪 (第 1-40 條)</h1>
-  <p id="status" style="font-size: 18px; color: #333;">正在寫入資料到 Firestore (`questions_bl` 集合)...</p>
+  <p id="status" style="font-size: 18px; color: #333;">正在將資料寫入 Firestore (`questions_bl` 集合)...</p>
 
   <script type="module">
     import { db } from './firebase-config.js';
@@ -14,251 +14,291 @@
 
     const part1Questions = [
       {
-        id: 1, article_number: 1, type: "single",
+        id: 1, article: 1, type: "single",
         question: "根據《香港基本法》第一條，香港特別行政區是中華人民共和國的什麼部分？",
-        options: { A: "不可分離的部分", B: "高度自治的特區", C: "自由貿易的港口", D: "實行特別制度的區域" },
-        answer: "A", explanation: "香港特別行政區是中華人民共和國不可分離的部分。"
+        options: { A: "高度自治的特區", B: "不可分離的部分", C: "自由貿易的港口", D: "實行特別制度的區域" },
+        answer: "B",
+        explanation: "香港特別行政區是中華人民共和國不可分離的部分。"
       },
       {
-        id: 2, article_number: 2, type: "multiple",
+        id: 2, article: 2, type: "multiple",
         question: "根據《香港基本法》第二條，全國人民代表大會授權香港特別行政區依照本法的規定實行高度自治，享有下列哪些權利？\n① 行政管理權\n② 立法權\n③ 獨立的司法權\n④ 終審權",
         options: { A: "僅 ①②", B: "僅 ①③④", C: "僅 ②③④", D: "①②③④" },
-        answer: "D", explanation: "全國人大授權香港特區享有行政管理權、立法權、獨立的司法權和終審權。"
+        answer: "D",
+        explanation: "全國人大授權香港特區享有行政管理權、立法權、獨立的司法權和終審權。"
       },
       {
-        id: 3, article_number: 3, type: "single",
+        id: 3, article: 3, type: "single",
         question: "根據《香港基本法》第三條，香港特別行政區的行政機關和立法機關由誰依照本法有關規定組成？",
-        options: { A: "中央人民政府直接委任", B: "香港永久性居民", C: "當地選舉委員會全體委員", D: "全國人大常委會指定代表" },
-        answer: "B", explanation: "香港特別行政區的行政機關和立法機關由香港永久性居民依照本法有關規定組成。"
+        options: { A: "中央人民政府直接委任", B: "當地選舉委員會全體委員", C: "香港永久性居民", D: "全國人大常委會指定代表" },
+        answer: "C",
+        explanation: "香港特別行政區的行政機關和立法機關由香港永久性居民依照本法有關規定組成。"
       },
       {
-        id: 4, article_number: 4, type: "multiple",
-        question: "根據《香港基本法》第四條，香港特別行政區依法保障香港特別行政區居民和其他人在香港的哪些項目？\n① 權利\n② 自由\n③ 投資收益",
-        options: { A: "僅 ①②", B: "僅 ②③", C: "僅 ①③", D: "①②③" },
-        answer: "A", explanation: "香港特區依法保障香港居民和其他人在香港的權利和自由。"
+        id: 4, article: 4, type: "multiple",
+        question: "根據《香港基本法》第四條，香港特別行政區依法保障香港特別行政區居民和其他人在香港的哪些項目？\n① 權利\n② 自由",
+        options: { A: "①②", B: "僅 ①", C: "僅 ②", D: "以上皆非" },
+        answer: "A",
+        explanation: "香港特區依法保障香港居民和其他人在香港的權利和自由。"
       },
       {
-        id: 5, article_number: 5, type: "single",
+        id: 5, article: 5, type: "single",
         question: "根據《香港基本法》第五條，香港不實行社會主義制度和政策，保持原有的資本主義制度和生活方式，多少年不變？",
-        options: { A: "三十年", B: "四十年", C: "五十年", D: "一百年" },
-        answer: "C", explanation: "香港不實行社會主義制度和政策，保持原有的資本主義制度和生活方式，五十年不變。"
+        options: { A: "三十年", B: "五十年", C: "四十年", D: "一百年" },
+        answer: "B",
+        explanation: "香港不實行社會主義制度和政策，保持原有的資本主義制度和生活方式，五十年不變。"
       },
       {
-        id: 6, article_number: 6, type: "multiple",
+        id: 6, article: 6, type: "multiple",
         question: "根據《香港基本法》第六條，香港特別行政區依法保護私有財產權的哪些項目？\n① 取得權\n② 使用權\n③ 處置權\n④ 繼承權",
-        options: { A: "僅 ①②", B: "僅 ③④", C: "僅 ①②③", D: "①②③④" },
-        answer: "D", explanation: "香港特區依法保護法人和非法人的私有財產的取得、使用、處置和繼承的權利。"
+        options: { A: "僅 ①②", B: "僅 ③④", C: "①②③④", D: "僅 ①②③" },
+        answer: "C",
+        explanation: "香港特區依法保護法人和非法人的私有財產的取得、使用、處置和繼承的權利。"
       },
       {
-        id: 7, article_number: 7, type: "single",
+        id: 7, article: 7, type: "single",
         question: "根據《香港基本法》第七條，香港特別行政區境內的土地和自然資源屬於誰所有？",
-        options: { A: "國家所有", B: "香港特別行政區政府所有", C: "個別私人業主所有", D: "香港原居民所有" },
-        answer: "A", explanation: "香港特別行政區境內的土地和自然資源屬於國家所有。"
+        options: { A: "香港特別行政區政府所有", B: "個別私人業主所有", C: "香港原居民所有", D: "國家所有" },
+        answer: "D",
+        explanation: "香港特別行政區境內的土地和自然資源屬於國家所有。"
       },
       {
-        id: 8, article_number: 8, type: "multiple",
+        id: 8, article: 8, type: "multiple",
         question: "根據《香港基本法》第八條，香港原有法律包含下列哪些？\n① 普通法和衡平法\n② 條例\n③ 附屬立法\n④ 習慣法",
-        options: { A: "僅 ①②", B: "僅 ③④", C: "僅 ①②③", D: "①②③④" },
-        answer: "D", explanation: "香港原有法律，即普通法、衡平法、條例、附屬立法和習慣法予以保留。"
+        options: { A: "僅 ①②", B: "①②③④", C: "僅 ③④", D: "僅 ①②③" },
+        answer: "B",
+        explanation: "香港原有法律，即普通法、衡平法、條例、附屬立法和習慣法予以保留。"
       },
       {
-        id: 9, article_number: 9, type: "single",
+        id: 9, article: 9, type: "single",
         question: "根據《香港基本法》第九條，香港特別行政區的行政機關、立法機關和司法機關，除使用中文外，還可使用哪一種語文作為正式語文？",
-        options: { A: "法文", B: "英文", C: "葡萄牙文", D: "德文" },
-        answer: "B", explanation: "香港特區的行政機關、立法機關和司法機關，除使用中文外，還可使用英文，英文也是正式語文。"
+        options: { A: "英文", B: "法文", C: "葡萄牙文", D: "德文" },
+        answer: "A",
+        explanation: "香港特區的行政機關、立法機關和司法機關，除使用中文外，還可使用英文，英文也是正式語文。"
       },
       {
-        id: 10, article_number: 10, type: "multiple",
+        id: 10, article: 10, type: "multiple",
         question: "根據《香港基本法》第十條，香港特別行政區除懸掛和使用中華人民共和國國旗和國徽外，還可以使用哪些標誌？\n① 香港特別行政區區旗\n② 香港特別行政區區徽",
-        options: { A: "僅 ①", B: "僅 ②", C: "①和②", D: "以上皆非" },
-        answer: "C", explanation: "香港特別行政區除懸掛和使用中華人民共和國國旗和國徽外，還可以使用香港特別行政區區旗和區徽。"
+        options: { A: "僅 ①", B: "僅 ②", C: "以上皆非", D: "①和②" },
+        answer: "D",
+        explanation: "香港特別行政區除懸掛和使用中華人民共和國國旗和國徽外，還可以使用香港特別行政區區旗和區徽。"
       },
       {
-        id: 11, article_number: 11, type: "single",
+        id: 11, article: 11, type: "single",
         question: "根據《香港基本法》第十一條，香港特別行政區立法機關制定的任何法律，均不得同什麼相牴觸？",
-        options: { A: "本法 (基本法)", B: "中華人民共和國憲法", C: "中英聯合聲明", D: "香港原有法律" },
-        answer: "A", explanation: "香港特區立法機關制定的任何法律，均不得同本法相牴觸。"
+        options: { A: "中華人民共和國憲法", B: "中英聯合聲明", C: "本法 (基本法)", D: "香港原有法律" },
+        answer: "C",
+        explanation: "香港特區立法機關制定的任何法律，均不得同本法相牴觸。"
       },
       {
-        id: 12, article_number: 12, type: "multiple",
+        id: 12, article: 12, type: "multiple",
         question: "根據《香港基本法》第十二條，香港特別行政區是中華人民共和國的一個享有高度自治權的地方行政區域，直轄於誰？\n① 中央人民政府",
-        options: { A: "僅 ①", B: "全國人大", C: "國務院港澳辦", D: "外交部" },
-        answer: "A", explanation: "香港特別行政區直轄於中央人民政府。"
+        options: { A: "全國人大", B: "僅 ①", C: "國務院港澳辦", D: "外交部" },
+        answer: "B",
+        explanation: "香港特別行政區直轄於中央人民政府。"
       },
       {
-        id: 13, article_number: 13, type: "single",
+        id: 13, article: 13, type: "single",
         question: "根據《香港基本法》第十三條，中央人民政府負責管理與香港特別行政區有關的什麼事務？",
-        options: { A: "外交事務", B: "內部治安", C: "經濟貿易", D: "教育制度" },
-        answer: "A", explanation: "中央人民政府負責管理與香港特區有關的外交事務。"
+        options: { A: "內部治安", B: "經濟貿易", C: "教育制度", D: "外交事務" },
+        answer: "D",
+        explanation: "中央人民政府負責管理與香港特區有關的外交事務。"
       },
       {
-        id: 14, article_number: 14, type: "multiple",
+        id: 14, article: 14, type: "multiple",
         question: "根據《香港基本法》第十四條，中央人民政府派駐香港特別行政區負責防務的軍隊，其費用由誰負擔？\n① 中央人民政府",
         options: { A: "香港特區政府", B: "僅 ①", C: "聯合國", D: "駐港部隊自籌" },
-        answer: "B", explanation: "中央人民政府派駐香港特別行政區負責防務的軍隊，費用由中央人民政府負擔。"
+        answer: "B",
+        explanation: "中央人民政府派駐香港特別行政區負責防務的軍隊，費用由中央人民政府負擔。"
       },
       {
-        id: 15, article_number: 15, type: "single",
+        id: 15, article: 15, type: "single",
         question: "根據《香港基本法》第十五條，中央人民政府依照本法第四章的規定，任命香港特別行政區的行政長官和誰？",
-        options: { A: "行政機關的主要官員", B: "立法會主席", C: "終審法院首席法官", D: "各區民政事務專員" },
-        answer: "A", explanation: "中央人民政府依照本法規定任命行政長官和行政機關的主要官員。"
+        options: { A: "立法會主席", B: "行政機關的主要官員", C: "終審法院首席法官", D: "各區民政事務專員" },
+        answer: "B",
+        explanation: "中央人民政府依照本法規定任命行政長官和行政機關的主要官員。"
       },
       {
-        id: 16, article_number: 16, type: "multiple",
+        id: 16, article: 16, type: "multiple",
         question: "根據《香港基本法》第十六條，香港特別行政區享有行政管理權，依照本法的有關規定自行處理香港特別行政區的什麼事務？\n① 行政事務",
-        options: { A: "外交事務", B: "國防事務", C: "僅 ①", D: "全國司法事務" },
-        answer: "C", explanation: "香港特區享有行政管理權，自行處理特區的行政事務。"
+        options: { A: "外交事務", B: "國防事務", C: "全國司法事務", D: "僅 ①" },
+        answer: "D",
+        explanation: "香港特區享有行政管理權，自行處理特區的行政事務。"
       },
       {
-        id: 17, article_number: 17, type: "single",
+        id: 17, article: 17, type: "single",
         question: "根據《香港基本法》第十七條，香港特別行政區享有立法權，特區立法機關制定的法律須報送到哪裡備案？",
-        options: { A: "全國人民代表大會常務委員會", B: "最高人民法院", C: "外交部駐港特派員公署", D: "國務院港澳辦" },
-        answer: "A", explanation: "香港特區的立法權屬於香港特別行政區立法會。立法機關制定的法律須報全國人民代表大會常務委員會備案。"
+        options: { A: "最高人民法院", B: "全國人民代表大會常務委員會", C: "外交部駐港特派員公署", D: "國務院港澳辦" },
+        answer: "B",
+        explanation: "香港特區的立法權屬於香港特別行政區立法會。立法機關制定的法律須報全國人民代表大會常務委員會備案。"
       },
       {
-        id: 18, article_number: 18, type: "multiple",
+        id: 18, article: 18, type: "multiple",
         question: "根據《香港基本法》第十八條，在香港特別行政區實行的法律包含下列哪些？\n① 本法\n② 本法第八條規定的香港原有法律\n③ 香港特別行政區立法機關制定的法律",
-        options: { A: "僅 ①②", B: "僅 ②③", C: "僅 ①③", D: "①②③" },
-        answer: "D", explanation: "在香港特區實行的法律為本法、本法第八條規定的香港原有法律以及香港特區立法機關制定的法律。"
+        options: { A: "僅 ①②", B: "①②③", C: "僅 ②③", D: "僅 ①③" },
+        answer: "B",
+        explanation: "在香港特區實行的法律為本法、本法第八條規定的香港原有法律以及香港特區立法機關制定的法律。"
       },
       {
-        id: 19, article_number: 19, type: "single",
+        id: 19, article: 19, type: "single",
         question: "根據《香港基本法》第十九條，香港特別行政區法院對國防、外交等國家行為無什麼權？",
-        options: { A: "管轄權", B: "起訴權", C: "辯護權", D: "調查權" },
-        answer: "A", explanation: "香港特區法院對國防、外交等國家行為無管轄權。"
+        options: { A: "起訴權", B: "辯護權", C: "管轄權", D: "調查權" },
+        answer: "C",
+        explanation: "香港特區法院對國防、外交等國家行為無管轄權。"
       },
       {
-        id: 20, article_number: 20, type: "multiple",
+        id: 20, article: 20, type: "multiple",
         question: "根據《香港基本法》第二十條，香港特別行政區可享有由誰授予的其他權力？\n① 全國人民代表大會\n② 全國人大常委會\n③ 中央人民政府",
         options: { A: "僅 ①②", B: "僅 ②③", C: "僅 ①③", D: "①②③" },
-        answer: "D", explanation: "香港特區可享有全國人大和全國人大常委會及中央人民政府授予的其他權力。"
+        answer: "D",
+        explanation: "香港特區可享有全國人大和全國人大常委會及中央人民政府授予的其他權力。"
       },
       {
-        id: 21, article_number: 21, type: "single",
+        id: 21, article: 21, type: "single",
         question: "根據《香港基本法》第二十一條，香港特別行政區居民中的中國公民依法參與管理什麼事務？",
         options: { A: "國家事務", B: "國際聯合國事務", C: "英國國會事務", D: "亞太經合組織事務" },
-        answer: "A", explanation: "香港特區居民中的中國公民依法參與國家事務的管理。"
+        answer: "A",
+        explanation: "香港特區居民中的中國公民依法參與國家事務的管理。"
       },
       {
-        id: 22, article_number: 22, type: "multiple",
+        id: 22, article: 22, type: "multiple",
         question: "根據《香港基本法》第二十二條，下列哪些主體不得干預香港特別行政區依照本法自行管理的事務？\n① 中央人民政府所屬各部門\n② 各省、自治區、直轄市",
         options: { A: "僅 ①", B: "僅 ②", C: "①和②", D: "皆可干預" },
-        answer: "C", explanation: "中央各部門及各地方均不得干預香港特區依照本法自行管理的事務。"
+        answer: "C",
+        explanation: "中央各部門及各地方均不得干預香港特區依照本法自行管理的事務。"
       },
       {
-        id: 23, article_number: 23, type: "single",
+        id: 23, article: 23, type: "single",
         question: "根據《香港基本法》第二十三條，香港特別行政區應自行立法禁止任何叛國、分裂國家、煽動叛亂、顛覆中央人民政府及什麼行為？",
         options: { A: "竊取國家機密", B: "非法罷工", C: "境外遊行", D: "批評特首" },
-        answer: "A", explanation: "香港特區應自行立法禁止叛國、分裂國家、煽動叛亂、顛覆中央人民政府及竊取國家機密。"
+        answer: "A",
+        explanation: "香港特區應自行立法禁止叛國、分裂國家、煽動叛亂、顛覆中央人民政府及竊取國家機密。"
       },
       {
-        id: 24, article_number: 24, type: "multiple",
+        id: 24, article: 24, type: "multiple",
         question: "根據《香港基本法》第二十四條，香港特別行政區居民包含下列哪些類別？\n① 永久性居民\n② 非永久性居民",
         options: { A: "僅 ①", B: "僅 ②", C: "①和②", D: "公民和非公民" },
-        answer: "C", explanation: "香港特別行政區居民，簡稱香港居民，包括永久性居民和非永久性居民。"
+        answer: "C",
+        explanation: "香港特別行政區居民，簡稱香港居民，包括永久性居民和非永久性居民。"
       },
       {
-        id: 25, article_number: 25, type: "single",
+        id: 25, article: 25, type: "single",
         question: "根據《香港基本法》第二十五條，香港居民在什麼面前一律平等？",
         options: { A: "法律", B: "政府", C: "經濟利益", D: "社會階級" },
-        answer: "A", explanation: "香港居民在法律面前一律平等。"
+        answer: "A",
+        explanation: "香港居民在法律面前一律平等。"
       },
       {
-        id: 26, article_number: 26, type: "multiple",
+        id: 26, article: 26, type: "multiple",
         question: "根據《香港基本法》第二十六條，香港特別行政區永久性居民依法享有下列哪些權利？\n① 選舉權\n② 被選舉權",
         options: { A: "僅 ①", B: "僅 ②", C: "①和②", D: "罷免權" },
-        answer: "C", explanation: "香港特別行政區永久性居民依法享有選舉權和被選舉權。"
+        answer: "C",
+        explanation: "香港特別行政區永久性居民依法享有選舉權和被選舉權。"
       },
       {
-        id: 27, article_number: 27, type: "single",
+        id: 27, article: 27, type: "single",
         question: "根據《香港基本法》第二十七條，香港居民享有言論、新聞、出版的自由，結社、集會、遊行、示威的自由，組織和參加工會、罷工的權利和什麼自由？",
         options: { A: "通訊自由", B: "信仰自由", C: "遷徙自由", D: "婚姻自由" },
-        answer: "A", explanation: "香港居民享有言論、新聞、出版的自由，結社、集會、遊行、示威的自由，組織和參加工會、罷工的權利和通訊自由。"
+        answer: "A",
+        explanation: "香港居民享有言論、新聞、出版的自由等權利和通訊自由。"
       },
       {
-        id: 28, article_number: 28, type: "multiple",
+        id: 28, article: 28, type: "multiple",
         question: "根據《香港基本法》第二十八條，關於香港居民的人身自由，下列表述何者正確？\n① 人身自由不受侵犯\n② 非經執法機關依法逮捕、拘禁，不受逮捕、拘禁\n③ 禁止非法拘禁和非法剝奪或者限制人身自由",
         options: { A: "僅 ①②", B: "僅 ②③", C: "僅 ①③", D: "①②③" },
-        answer: "D", explanation: "香港居民的人身自由不受侵犯，並有相應的法律保障。"
+        answer: "D",
+        explanation: "香港居民的人身自由不受侵犯，並有相應的法律保障。"
       },
       {
-        id: 29, article_number: 29, type: "single",
+        id: 29, article: 29, type: "single",
         question: "根據《香港基本法》第二十九條，香港居民的住宅和其他房屋受什麼保護，禁止任意或非法搜查或侵入？",
         options: { A: "法律", B: "物業保險", C: "警察巡邏", D: "私人合約" },
-        answer: "A", explanation: "香港居民的住宅和其他房屋不受侵犯，受法律保護。"
+        answer: "A",
+        explanation: "香港居民的住宅和其他房屋不受侵犯，受法律保護。"
       },
       {
-        id: 30, article_number: 30, type: "multiple",
+        id: 30, article: 30, type: "multiple",
         question: "根據《香港基本法》第三十條，香港居民的哪些權利受法律保護？\n① 通訊自由\n② 通訊秘密",
         options: { A: "僅 ①", B: "僅 ②", C: "①和②", D: "以上皆非" },
-        answer: "C", explanation: "香港居民的通訊自由和通訊秘密受法律保護。"
+        answer: "C",
+        explanation: "香港居民的通訊自由和通訊秘密受法律保護。"
       },
       {
-        id: 31, article_number: 31, type: "single",
+        id: 31, article: 31, type: "single",
         question: "根據《香港基本法》第三十一條，香港居民有在香港特別行政區境內遷徙的自由，有移居其他國家和地區的自由，還有什麼自由？",
         options: { A: "旅行和出入境的自由", B: "無限制居留外國的權利", C: "免簽證全球通行的自由", D: "隨意更換國籍的自由" },
-        answer: "A", explanation: "香港居民有旅行和出入境的自由。"
+        answer: "A",
+        explanation: "香港居民有旅行和出入境的自由。"
       },
       {
-        id: 32, article_number: 32, type: "multiple",
+        id: 32, article: 32, type: "multiple",
         question: "根據《香港基本法》第三十二條，香港居民享有下列哪項自由？\n① 宗教信仰自由",
         options: { A: "僅 ①", B: "政治信仰自由", C: "經濟學說信仰自由", D: "哲學流派信仰自由" },
-        answer: "A", explanation: "香港居民有宗教信仰自由。"
+        answer: "A",
+        explanation: "香港居民有宗教信仰自由。"
       },
       {
-        id: 33, article_number: 33, type: "single",
+        id: 33, article: 33, type: "single",
         question: "根據《香港基本法》第三十三條，香港居民有選擇什麼的自由？",
         options: { A: "職業", B: "居住大廈", C: "醫療保險", D: "交通工具" },
-        answer: "A", explanation: "香港居民有選擇職業的自由。"
+        answer: "A",
+        explanation: "香港居民有選擇職業的自由。"
       },
       {
-        id: 34, article_number: 34, type: "multiple",
+        id: 34, article: 34, type: "multiple",
         question: "根據《香港基本法》第三十四條，香港居民享有進行下列哪些活動的自由？\n① 學術研究\n② 文學藝術創作\n③ 其他文化活動",
         options: { A: "僅 ①②", B: "僅 ②③", C: "僅 ①③", D: "①②③" },
-        answer: "D", explanation: "香港居民有進行學術研究、文學藝術創作和其他文化活動的自由。"
+        answer: "D",
+        explanation: "香港居民有進行學術研究、文學藝術創作和其他文化活動的自由。"
       },
       {
-        id: 35, article_number: 35, type: "single",
+        id: 35, article: 35, type: "single",
         question: "根據《香港基本法》第三十五條，香港居民有權得到秘密法律諮詢、向法院提起訴訟、選擇律師在法庭上為其代理和獲得什麼？",
         options: { A: "司法救濟", B: "政府經濟補貼", C: "特赦豁免", D: "民事賠償保證" },
-        answer: "A", explanation: "香港居民有權得到司法救濟。"
+        answer: "A",
+        explanation: "香港居民有權得到司法救濟。"
       },
       {
-        id: 36, article_number: 36, type: "multiple",
+        id: 36, article: 36, type: "multiple",
         question: "根據《香港基本法》第三十六條，香港居民依法享有哪方面的福利？\n① 社會福利",
         options: { A: "免費股票配額", B: "僅 ①", C: "海外旅遊補助", D: "私人企業分紅" },
-        answer: "B", explanation: "香港居民依法享受社會福利。"
+        answer: "B",
+        explanation: "香港居民依法享受社會福利。"
       },
       {
-        id: 37, article_number: 37, type: "single",
+        id: 37, article: 37, type: "single",
         question: "根據《香港基本法》第三十七條，香港居民的婚姻自由和什麼權利受法律保護？",
         options: { A: "自願生育", B: "跨國領養", C: "無條件離婚", D: "終身免稅" },
-        answer: "A", explanation: "香港居民的婚姻自由和自願生育的權利受法律保護。"
+        answer: "A",
+        explanation: "香港居民的婚姻自由和自願生育的權利受法律保護。"
       },
       {
-        id: 38, article_number: 38, type: "multiple",
+        id: 38, article: 38, type: "multiple",
         question: "根據《香港基本法》第三十八條，在香港特別行政區境內的其他人也享有本章規定的香港居民的什麼？\n① 權利和自由",
         options: { A: "政治選舉權", B: "僅 ①", C: "永久居留權", D: "公務員參選權" },
-        answer: "B", explanation: "在香港特區境內的其他人也享有本章規定的香港居民的權利和自由。"
+        answer: "B",
+        explanation: "在香港特區境內的其他人也享有本章規定的香港居民的權利和自由。"
       },
       {
-        id: 39, article_number: 39, type: "single",
+        id: 39, article: 39, type: "single",
         question: "根據《香港基本法》第三十九條，《公民權利和政治權利國際公約》等適用於香港的有關規定繼續有效，通過香港特區的法律予以實施。香港居民享有的自由和權利，除依法規定外不得怎麼樣？",
         options: { A: "限制", B: "延期", C: "公開", D: "轉讓" },
-        answer: "A", explanation: "香港居民享有的權利和自由，除依法規定外不得限制。"
+        answer: "A",
+        explanation: "香港居民享有的權利和自由，除依法規定外不得限制。"
       },
       {
-        id: 40, article_number: 40, type: "multiple",
+        id: 40, article: 40, type: "multiple",
         question: "根據《香港基本法》第四十條，誰的合法傳統權益受香港特別行政區的保護？\n① “新界”原居民",
         options: { A: "僅 ①", B: "中央人民政府", C: "鄉議局內部組織", D: "英聯邦法院" },
-        answer: "A", explanation: "“新界”原居民的合法傳統權益受香港特別行政區的保護。"
+        answer: "A",
+        explanation: "“新界”原居民的合法傳統權益受香港特別行政區的保護。"
       }
     ];
 
     async function importData() {
       const statusEl = document.getElementById('status');
       try {
-        statusEl.innerText = "正在將資料寫入 Firestore (`questions_bl` 集合)...";
+        statusEl.innerText = "正在將第 1-40 條資料寫入 Firestore (`questions_bl` 集合)...";
         for (let q of part1Questions) {
           await setDoc(doc(db, "questions_bl", `q_${q.id}`), q);
         }

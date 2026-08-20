@@ -74,21 +74,25 @@
       const container = document.getElementById('options-container');
       container.innerHTML = '';
 
-      Object.keys(q.options).sort().forEach(key => {
-        const optBtn = document.createElement('button');
-        optBtn.className = "w-full text-left p-4 rounded-xl bg-slate-700/80 hover:bg-slate-600 border border-slate-600 flex items-center space-x-3 transition";
-        optBtn.innerHTML = `<span class="w-6 h-6 rounded-full border border-slate-400 flex items-center justify-center text-xs font-bold">${key}</span> <span>${q.options[key]}</span>`;
-        
-        optBtn.onclick = () => {
-          document.querySelectorAll('#options-container button').forEach(b => b.classList.remove('border-sky-500', 'bg-sky-950/40'));
-          optBtn.classList.add('border-sky-500', 'bg-sky-950/40');
-          selectedAnswer = key;
-          nextBtn.classList.remove('hidden');
-          nextBtn.innerText = currentIndex === questions.length - 1 ? "提交答案，完成問答" : "下一題";
-        };
+Object.keys(q.options).sort().forEach(key => {
+  const optBtn = document.createElement('button');
+  optBtn.className = "w-full text-left p-4 rounded-xl bg-slate-700/80 hover:bg-slate-600 border border-slate-600 flex items-center space-x-3 transition";
+  
+  // 這裡拿掉了顯示 0,1,2,3 的 span，只保留選項文字
+  optBtn.innerHTML = `<span class="text-slate-200">${q.options[key]}</span>`;
 
-        container.appendChild(optBtn);
-      });
+  optBtn.onclick = () => {
+    document.querySelectorAll('#options-container button').forEach(b => b.classList.remove('border-sky-500', 'bg-sky-950/40'));
+    optBtn.classList.add('border-sky-500', 'bg-sky-950/40');
+    selectedAnswer = key; // 保持原本的 key 邏輯不變
+    nextBtn.classList.remove('hidden');
+    nextBtn.innerText = currentIndex === questions.length - 1 ? "提交答案，完成問答" : "下一題";
+  };
+
+  container.appendChild(optBtn);
+});
+
+      
     }
 
     window.handleNextQuestion = async function() {

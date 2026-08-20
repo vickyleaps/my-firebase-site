@@ -2,72 +2,315 @@
 <html lang="zh-HK">
 <head>
   <meta charset="UTF-8">
-  <title>Import BL Questions - Part 2 (3-Items Multiple Choice)</title>
+  <title>Import BL Questions - Part 2 (Articles 41-80 Randomized)</title>
 </head>
 <body style="font-family: sans-serif; text-align: center; margin-top: 50px;">
-  <h1>香港基本法題目匯入 (複合題三選項升級版)</h1>
-  <p id="status" style="font-size: 18px; color: #333;">正在寫入 Firestore...</p>
+  <h1>香港基本法題目匯入 (第 41-80 條 選項隨機校對版)</h1>
+  <p id="status" style="font-size: 18px; color: #333;">正在寫入修正後的第 41-80 條 Firestore 資料...</p>
 
   <script type="module">
     import { db } from './firebase-config.js';
     import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    const part2Questions = [
-      { id: 41, article: 41, type: "single", question: "根據《香港基本法》第四十一條，在香港特別行政區內的華人以外的其他人，是否享有本章規定的香港居民的權利和自由？", options: { A: "完全不享有", B: "依法享有", C: "僅享有部分經濟權利", D: "需經特首特許方可享有" }, answer: "B", explanation: "依法享有。" },
-      { id: 42, article: 42, type: "multiple", question: "根據《香港基本法》第四十二條，香港居民和在香港的其他人有義務遵守在香港特別行政區實行的哪些規定？\n① 法律\n② 當地規章\n③ 習慣法", options: { A: "僅 ①", B: "僅 ①②", C: "①、②和③", D: "以上皆非" }, answer: "A", explanation: "有義務遵守法律。" },
-      { id: 43, article: 43, type: "single", question: "根據《香港基本法》第四十三條，行政長官向誰負責？", options: { A: "全體香港永久性居民", B: "全國人民代表大會常務委員會", C: "中央人民政府和香港特別行政區", D: "香港立法會" }, answer: "C", explanation: "對中央人民政府和香港特別行政區負責。" },
-      { id: 44, article: 44, type: "multiple", question: "根據《香港基本法》第四十四條，行政長官任職資格：\n① 年滿四十周歲\n② 通常居住連續滿二十年\n③ 在外國無居留權", options: { A: "僅 ①②", B: "僅 ②③", C: "①、②和③", D: "以上皆非" }, answer: "C", explanation: "需年滿四十歲、居住滿二十年且在外國無居留權。" },
-      { id: 45, article: 45, type: "single", question: "根據《香港基本法》第四十五條，行政長官由誰任命？", options: { A: "全國人民代表大會", B: "國務院港澳辦", C: "香港終審法院", D: "中央人民政府" }, answer: "D", explanation: "由中央人民政府任命。" },
-      { id: 46, article: 46, type: "multiple", question: "根據《香港基本法》第四十六條，行政長官任期：\n① 任期五年\n② 可連任一次\n③ 可連任兩次", options: { A: "僅 ①②", B: "僅 ①③", C: "僅 ②③", D: "以上皆非" }, answer: "A", explanation: "任期五年，可連任一次。" },
-      { id: 47, article: 47, type: "single", question: "根據《香港基本法》第四十七條，行政長官申報財產向誰負責？", options: { A: "中央人民政府", B: "終審法院", C: "立法會", D: "審計署" }, answer: "A", explanation: "向中央人民政府負責並申報。" },
-      { id: 48, article: 48, type: "multiple", question: "根據《香港基本法》第四十八條，特首部分職權：\n① 簽署法案、發布法案\n② 決定政府政策和發布行政命令\n③ 提名並報請中央人民政府任命主要官員", options: { A: "僅 ①②", B: "僅 ②③", C: "僅 ①③", D: "①、②和③" }, answer: "D", explanation: "以上皆為特首職權。" },
-      { id: 49, article: 49, type: "single", question: "根據《香港基本法》第四十九條，法案不符整體利益，特首可發回重議，期限為：", options: { A: "一個月", B: "兩個月", C: "三個月", D: "六個月" }, answer: "C", explanation: "三個月內。" },
-      { id: 50, article: 50, type: "multiple", question: "根據《香港基本法》第五十條，解散立法會相關規定：\n① 經協商仍不能取得一致意見時可解散\n② 須徵詢行政會議意見\n③ 在其一任任期內只能解散一次", options: { A: "僅 ①②", B: "僅 ②③", C: "僅 ①③", D: "①、②和③" }, answer: "D", explanation: "三項皆為解散立法會的法定條件。" },
-      { id: 51, article: 51, type: "single", question: "根據《香港基本法》第五十一條，拒絕通過財政預算案時，可批准：", options: { A: "增加開支的撥款", B: "上一財政年度開支標準的撥款", C: "經立法會重議的撥款", D: "不准撥款" }, answer: "B", explanation: "按上一財政年度標準。" },
-      { id: 52, article: 52, type: "multiple", question: "根據《香港基本法》第五十二條，特首必須辭職的情況：\n① 因嚴重疾病或其他原因無法履行職務\n② 立法會經重選後再次拒絕通過所爭議的原法案\n③ 經重選的立法會拒絕通過財政預算案", options: { A: "僅 ①②", B: "僅 ②③", C: "僅 ①③", D: "①、②和③" }, answer: "D", explanation: "三項均為辭職條件。" },
-      { id: 53, article: 53, type: "single", question: "根據《香港基本法》第五十三條，特首暫代職務順序：", options: { A: "立法會主席 -> 終審法院首席法官", B: "政務司長 -> 財政司長 -> 律政司長", C: "行政會議召集人 -> 政務司長", D: "由中央直接指派" }, answer: "B", explanation: "政務、財政、律政司長依次。" },
-      { id: 54, article: 54, type: "multiple", question: "根據《香港基本法》第五十四條，行政會議：\n① 是協助特首決策的機構\n② 由特首主持開會\n③ 屬諮詢組織性質", options: { A: "僅 ①②", B: "僅 ②③", C: "僅 ①③", D: "①、②和③" }, answer: "D", explanation: "三者皆正確。" },
-      { id: 55, article: 55, type: "single", question: "根據《香港基本法》第五十五條，行政會議成員由誰委任？", options: { A: "中央政府", B: "立法會", C: "行政長官", D: "選舉委員會" }, answer: "C", explanation: "由行政長官委任。" },
-      { id: 56, article: 56, type: "multiple", question: "根據《香港基本法》第五十六條，行政會議運作：\n① 行政會議由行政長官主持\n② 重要決策前須徵詢行政會議意見\n③ 不採納多數意見須記錄具體理由", options: { A: "僅 ①②", B: "僅 ②③", C: "僅 ①③", D: "①、②和③" }, answer: "D", explanation: "三者皆正確。" },
-      { id: 57, article: 57, type: "single", question: "根據《香港基本法》第五十七條，設立什麼機構獨立行使審計監督？", options: { A: "廉政公署", B: "審計署", C: "律政司", D: "金融管理局" }, answer: "B", explanation: "審計署。" },
-      { id: 58, article: 58, type: "multiple", question: "根據《香港基本法》第五十八條，廉政公署：\n① 設立專責機構以消除貪污\n② 獨立工作\n③ 直接向行政長官負責", options: { A: "僅 ①②", B: "僅 ②③", C: "僅 ①③", D: "①、②和③" }, answer: "D", explanation: "三者皆正確。" },
-      { id: 59, article: 59, type: "single", question: "根據《香港基本法》第五十九條，特區政府是：", options: { A: "行政機關", B: "立法機關", C: "司法機關", D: "諮詢機關" }, answer: "A", explanation: "行政機關。" },
-      { id: 60, article: 60, type: "multiple", question: "根據《香港基本法》第六十條，特區政府架構：\n① 首長是行政長官\n② 政府內部設政務司、財政司、律政司\n③ 設各局、處、署", options: { A: "僅 ①②", B: "僅 ②③", C: "僅 ①③", D: "①、②和③" }, answer: "D", explanation: "三者皆正確。" },
-      { id: 61, article: 61, type: "single", question: "根據《香港基本法》第六十一條，主要官員通常居住需連續滿：", options: { A: "5年", B: "10年", C: "15年", D: "20年" }, answer: "C", explanation: "15年。" },
-      { id: 62, article: 62, type: "multiple", question: "根據《香港基本法》第六2條，政府部分職權：\n① 制定並執行政策\n② 管理各項行政事務\n③ 編制並提出財政預算、決算", options: { A: "僅 ①②", B: "僅 ②③", C: "僅 ①③", D: "①、②和③" }, answer: "D", explanation: "三者皆正確。" },
-      { id: 63, article: 63, type: "single", question: "根據《香港基本法》第六十三條，律政司主管：", options: { A: "審計", B: "刑事檢控", C: "行政事務", D: "土地規劃" }, answer: "B", explanation: "主管刑事檢控。" },
-      { id: 64, article: 64, type: "multiple", question: "根據《香港基本法》第六十四條，政府對立法會負責包括：\n① 執行立法會通過並已生效的法律\n② 定期向立法會作施政報告\n③ 答覆立法會議員的質詢", options: { A: "僅 ①②", B: "僅 ②③", C: "僅 ①③", D: "①、②和③" }, answer: "D", explanation: "三者皆正確。" },
-      { id: 65, article: 65, type: "single", question: "根據《香港基本法》第六十五條，保留原有：", options: { A: "法律及訴訟程序", B: "大清律例", C: "總督特許令", D: "英國國會法案" }, answer: "A", explanation: "保留法律及訴訟程序。" },
-      { id: 66, article: 66, type: "multiple", question: "根據《香港基本法》第六十六條，各級法院包括：\n① 終審法院\n② 高等法院\n③ 區域法院及裁判法院", options: { A: "僅 ①②", B: "僅 ②③", C: "僅 ①③", D: "①、②和③" }, answer: "D", explanation: "三者皆包括。" },
-      { id: 67, article: 67, type: "single", question: "根據《香港基本法》第六十七條，終審權歸：", options: { A: "最高人民法院", B: "特區終審法院", C: "人大常委會", D: "國際法庭" }, answer: "B", explanation: "特區終審法院。" },
-      { id: 68, article: 68, type: "multiple", question: "根據《香港基本法》第六十八條，立法會產生辦法原則：\n① 根據香港實際情況\n② 循序漸進\n③ 最終達至全部議員由普選產生", options: { A: "僅 ①②", B: "僅 ②③", C: "僅 ①③", D: "①、②和③" }, answer: "D", explanation: "三者皆正確。" },
-      { id: 69, article: 69, type: "single", question: "根據《香港基本法》第六十九條，立法會（除首屆外）任期：", options: { A: "3年", B: "4年", C: "5年", D: "6年" }, answer: "B", explanation: "4年。" },
-      { id: 70, article: 70, type: "multiple", question: "根據《香港基本法》第七十條，解散後重行選舉：\n① 須於三個月內\n② 依第六十八條規定\n③ 由行政長官宣佈", options: { A: "僅 ①②", B: "僅 ②③", C: "僅 ①③", D: "①、②和③" }, answer: "A", explanation: "依條文為三個月內及依第六十八條規定（③非本條原文要求）。" },
-      { id: 71, article: 71, type: "single", question: "根據《香港基本法》第七十一條，立法會主席由：", options: { A: "特首委任", B: "議員互選", C: "中央指定", D: "行政會議推薦" }, answer: "B", explanation: "議員互選。" },
-      { id: 72, article: 72, type: "multiple", question: "根據《香港基本法》第七十二條，立法會主席部分職權：\n① 主持會議\n② 決定議程\n③ 決定開會時間", options: { A: "僅 ①②", B: "僅 ②③", C: "僅 ①③", D: "①、②和③" }, answer: "D", explanation: "三者皆正確。" },
-      { id: 73, article: 73, type: "single", question: "根據《香港基本法》第七十三條，立法會可：", options: { A: "制定法律", B: "直接任命官員", C: "否決人大釋法", D: "修改基本法" }, answer: "A", explanation: "制定法律。" },
-      { id: 74, article: 74, type: "multiple", question: "根據《香港基本法》第七十四條，議員私人議案限制：\n① 不涉及公共開支或政治體制或政府運作者可提出\n② 涉及政府政策者須得特首書面同意\n③ 可隨時自由提出任何議案", options: { A: "僅 ①②", B: "僅 ②③", C: "僅 ①③", D: "①、②和③" }, answer: "A", explanation: "①與②正確，③錯誤。" },
-      { id: 75, article: 75, type: "single", question: "根據《香港基本法》第七十五條，法定開會人數：", options: { A: "三分之一", B: "二分之一", C: "三分之二", D: "四分之三" }, answer: "B", explanation: "二分之一。" },
-      { id: 76, article: 76, type: "multiple", question: "根據《香港基本法》第七十六條，法案生效須：\n① 經立法會通過\n② 特首簽署\n③ 特首公佈", options: { A: "僅 ①②", B: "僅 ②③", C: "僅 ①③", D: "①、②和③" }, answer: "D", explanation: "三者皆需要。" },
-      { id: 77, article: 77, type: "single", question: "根據《香港基本法》第七十七條，立法會發言：", options: { A: "不受法律追究", B: "完全無限制", C: "須向特首負責", D: "需受司法審查" }, answer: "A", explanation: "不受法律追究。" },
-      { id: 78, article: 78, type: "multiple", question: "根據《香港基本法》第七十八條，議員不受逮捕：\n① 出席會議時\n② 前往會議途中\n③ 離開立法會大樓時", options: { A: "僅 ①②", B: "僅 ②③", C: "僅 ①③", D: "①、②和③" }, answer: "A", explanation: "①與②正確（③非條文明文）。" },
-      { id: 79, article: 79, type: "single", question: "根據《香港基本法》第七十九條，喪失議員資格須經：", options: { A: "過半數", B: "全體一致", C: "三分之二", D: "四分之三" }, answer: "C", explanation: "三分之二。" },
-      { id: 80, article: 80, type: "multiple", question: "根據《香港基本法》第八十條，司法機關：\n① 香港特別行政區各級法院是司法機關\n② 各級法院行使審判權\n③ 各級法院受行政長官指揮", options: { A: "僅 ①②", B: "僅 ②③", C: "僅 ①③", D: "①、②和③" }, answer: "A", explanation: "①與②正確，③錯誤（法院獨立審判）。" }
+    const questionsPart2 = [
+      // --- 第 41-80 條：單數單選 / 雙數複合（答案與選項已隨機化分佈） ---
+      {
+        id: 41, article: 41, type: "single",
+        question: "根據《香港基本法》第四十一條，在香港特別行政區境內的香港居民以外的其他人，依法享有甚麼？",
+        options: { A: "所有內地居民的全國性法定公民權利", B: "本章規定的香港居民的權利和自由", C: "僅限於經特區政府特許的商業權利", D: "無條件參與選舉及被選舉的權利" },
+        answer: "B",
+        explanation: "在香港特別行政區境內的香港居民以外的其他人，依法享有本章規定的香港居民的權利和自由。"
+      },
+      {
+        id: 42, article: 42, type: "multiple",
+        question: "根據《香港基本法》第四十二條，關於在香港的人士之義務，下列何者正確？\n① 香港居民有遵守香港特別行政區實行的法律的義務\n② 在香港的其他人有遵守香港特別行政區實行的法律的義務\n③ 享有權利的人可豁免遵守部分地方法律",
+        options: { A: "僅 ①②", B: "①、②和③", C: "僅 ②③", D: "僅 ①③" },
+        answer: "A",
+        explanation: "香港居民和在香港的其他人都有遵守香港特別行政區實行的法律的義務。"
+      },
+      {
+        id: 43, article: 43, type: "single",
+        question: "根據《香港基本法》第四十三條，香港特別行政區行政長官是香港特別行政區的首長，代表甚麼？",
+        options: { A: "全體立法會議員", B: "大英國協組織", C: "香港特別行政區", D: "香港本地各大商會" },
+        answer: "C",
+        explanation: "香港特別行政區行政長官是香港特別行政區的首長，代表香港特別行政區。"
+      },
+      {
+        id: 44, article: 44, type: "multiple",
+        question: "根據《香港基本法》第四十四條，香港特別行政區行政長官須符合下列哪些條件？\n① 年滿四十周歲\n② 在香港通常居住連續滿二十年\n③ 在外國無居留權的香港特別行政區永久性居民中的中國公民",
+        options: { A: "僅 ①②", B: "僅 ②③", C: "僅 ①③", D: "①、②和③" },
+        answer: "D",
+        explanation: "三項均為行政長官參選與出任的法定資格條件。"
+      },
+      {
+        id: 45, article: 45, type: "single",
+        question: "根據《香港基本法》第四十五條，香港特別行政區行政長官在當地透過選舉或協商產生，由誰任命？",
+        options: { A: "全國人民代表大會常務委員會", B: "香港立法會", C: "中央人民政府", D: "最高人民法院" },
+        answer: "C",
+        explanation: "行政長官在當地透過選舉或協商產生，由中央人民政府任命。"
+      },
+      {
+        id: 46, article: 46, type: "multiple",
+        question: "根據《香港基本法》第四十六條，關於香港特別行政區行政長官任期的敘述，下列何者正確？\n① 每屆任期五年\n② 可連任一次\n③ 任期內不得兼任其他私人企業職務",
+        options: { A: "①、②和③", B: "僅 ①②", C: "僅 ②③", D: "僅 ①③" },
+        answer: "B",
+        explanation: "香港特別行政區行政長官每屆任期五年，可連任一次（不包含第三項兼職限制）。"
+      },
+      {
+        id: 47, article: 47, type: "single",
+        question: "根據《香港基本法》第四十七條，香港特別行政區行政長官必須廉潔奉公，依法申報甚麼？",
+        options: { A: "政黨黨籍", B: "家族成員背景", C: "學術論文著作", D: "財產" },
+        answer: "D",
+        explanation: "行政長官必須廉潔奉公，依法向香港特別行政區終審法院首席法官申報財產。"
+      },
+      {
+        id: 48, article: 48, type: "multiple",
+        question: "根據《香港基本法》第四十八條，香港特別行政區行政長官行使下列哪些職權？\n① 領導香港特別行政區政府\n② 負責執行本法和符合本法適用于香港的其他法律\n③ 簽署立法會通過的法案，公布法律",
+        options: { A: "僅 ①②", B: "①、②和③", C: "僅 ②③", D: "僅 ①③" },
+        answer: "B",
+        explanation: "三項均為行政長官法定行使的職權。"
+      },
+      {
+        id: 49, article: 49, type: "single",
+        question: "根據《香港基本法》第四十九條，行政長官若認為立法會通過的法案不符合香港特別行政區的整體利益，可將法案發還甚麼機關？",
+        options: { A: "終審法院", B: "立法會", C: "行政會議", D: "全國人大常委會" },
+        answer: "B",
+        explanation: "行政長官可將法案發還立法會重議。"
+      },
+      {
+        id: 50, article: 50, type: "multiple",
+        question: "根據《香港基本法》第五十條，關於行政長官解散立法會與辭職的程序，下列何者正確？\n① 立法會拒絕通過財政預算案或其他重要法案，經協商仍無法取得一致意見，行政長官可解散立法會\n② 重行選出的立法會仍拒絕通過原議案，行政長官必須辭職\n③ 行政長官在兩年任期內最多只能解散立法會一次",
+        options: { A: "僅 ①③", B: "僅 ②③", C: "①、②和③", D: "僅 ①②" },
+        answer: "C",
+        explanation: "三項均符合基本法第五十條關於解散立法會及辭職的規定。"
+      },
+      {
+        id: 51, article: 51, type: "single",
+        question: "根據《香港基本法》第五十一條，若立法會拒絕批准政府提出的財政預算案，行政長官可向立法會申請甚麼？",
+        options: { A: "長期國債發行權", B: "臨時撥款", C: "中央財政補貼", D: "特別稅收豁免" },
+        answer: "B",
+        explanation: "經行政長官批准，政府可向立法會提出臨時撥款申請。"
+      },
+      {
+        id: 52, article: 52, type: "multiple",
+        question: "根據《香港基本法》第五十二條，行政長官必須辭職的情形包括下列哪些？\n① 因嚴重疾病或其他原因無法履行職務\n② 立法會重行選出後仍拒絕通過所爭議的原議案\n③ 經立法會全體議員三分之二聯合動議指控行政長官嚴重違法或瀆職，經調查委員會審議後提交終審法院首席法官負責審判並成立",
+        options: { A: "①、②和③", B: "僅 ①②", C: "僅 ②③", D: "僅 ①③" },
+        answer: "A",
+        explanation: "三項均為規定行政長官必須辭職的法定情形。"
+      },
+      {
+        id: 53, article: 53, type: "single",
+        question: "根據《香港基本法》第五十三條，行政長官短期不能履職時，由誰依照序列暫行代理職務？",
+        options: { A: "立法會主席、終審法院首席法官、行政會議召集人", B: "民政及青年事務局局長、保安局局長", C: "政務司長、財政司長、律政司長", D: "中央駐港聯絡辦主任" },
+        answer: "C",
+        explanation: "行政長官短期不能履職時，由政務司長、財政司長、律政司長依次暫行代理職務。"
+      },
+      {
+        id: 54, article: 54, type: "multiple",
+        question: "根據《香港基本法》第五十四條，關於香港特別行政區行政會議的敘述，下列何者正確？\n① 是協助行政長官決策的機構\n② 成員由行政長官從行政機關主要官員、立法會議員和社會人士中委任\n③ 由行政長官主持",
+        options: { A: "僅 ①②", B: "僅 ②③", C: "①、②和③", D: "僅 ①③" },
+        answer: "C",
+        explanation: "三項均為基本法對行政會議性質與組成的規定。"
+      },
+      {
+        id: 55, article: 55, type: "single",
+        question: "根據《香港基本法》第五十五條，香港特別行政區行政會議的成員由誰委任？",
+        options: { A: "中央人民政府", B: "立法會全體投票決定", C: "行政長官", D: "終審法院首席法官" },
+        answer: "C",
+        explanation: "行政會議成員由行政長官從行政機關主要官員、立法會議員和社會人士中委任。"
+      },
+      {
+        id: 56, article: 56, type: "multiple",
+        question: "根據《香港基本法》第五十六條，關於行政會議的運作，下列何者正確？\n① 行政會議由行政長官主持\n② 重要政策決議、向立法會提交法案等事項，行政長官在作出決定前須征詢行政會議的意見\n③ 若行政長官不採納行政會議多數成員的意見，應將具體理由記錄在案",
+        options: { A: "僅 ①②", B: "①、②和③", C: "僅 ②③", D: "僅 ①③" },
+        answer: "B",
+        explanation: "三項均符合基本法第五十六條之規定。"
+      },
+      {
+        id: 57, article: 57, type: "single",
+        question: "根據《香港基本法》第五十七條，香港特別行政區設立甚麼獨立機構，對公職人員的貪污行為進行偵查？",
+        options: { A: "審計署", B: "申訴專員公署", C: "警務處國家安全處", D: "廉政公署" },
+        answer: "D",
+        explanation: "香港特別行政區設立廉政公署，獨立工作。"
+      },
+      {
+        id: 58, article: 58, type: "multiple",
+        question: "根據《香港基本法》第五十八條，關於審計署的敘述，下列何者正確？\n① 設立審計署獨立工作\n② 對香港特別行政區政府的財政收支進行審計監督\n③ 向行政長官負責並提交報告",
+        options: { A: "僅 ①②", B: "①、②和③", C: "僅 ②③", D: "僅 ①③" },
+        answer: "B",
+        explanation: "三項均為審計署的職責與定位。"
+      },
+      {
+        id: 59, article: 59, type: "single",
+        question: "根據《香港基本法》第五十九條，香港特別行政區政府是香港特別行政區的甚麼機關？",
+        options: { A: "立法機關", B: "司法機關", C: "行政機關", D: "最高諮詢機關" },
+        answer: "C",
+        explanation: "香港特別行政區政府是香港特別行政區的行政機關。"
+      },
+      {
+        id: 60, article: 60, type: "multiple",
+        question: "根據《香港基本法》第六十條，關於香港特別行政區政府首長與主要官員的敘述，下列何者正確？\n① 香港特別行政區政府首長是行政長官\n② 政府設政務司長、財政司長、律政司長和各局局長等主要官員\n③ 主要官員由中央人民政府任命",
+        options: { A: "僅 ①②", B: "僅 ②③", C: "①、②和③", D: "僅 ①③" },
+        answer: "C",
+        explanation: "三項均符合基本法第六十條之規定。"
+      },
+      {
+        id: 61, article: 61, type: "single",
+        question: "根據《香港基本法》第六十一條，香港特別行政區的主要官員由誰擔任？",
+        options: { A: "任何持有香港永久性居民身分證的外籍人士", B: "在外國無居留權的香港特別行政區永久性居民中的中國公民", C: "中央人民政府直接委派的內地官員", D: "經選舉產生的各區區議會主席" },
+        answer: "B",
+        explanation: "主要官員必須由在外國無居留權的香港特別行政區永久性居民中的中國公民擔任。"
+      },
+      {
+        id: 62, article: 62, type: "multiple",
+        question: "根據《香港基本法》第六十二條，香港特別行政區政府行使下列哪些職權？\n① 制定並執行政策\n② 編製並提出財政預算案和法案\n③ 委任各級司法人員",
+        options: { A: "僅 ①②", B: "①、②和③", C: "僅 ②③", D: "僅 ①③" },
+        answer: "A",
+        explanation: "香港政府可行使制定政策、執行政策、編製並提出財政預算與法案等職權（委任司法人員屬於獨立委員會與首長任命，非政府單獨職權）。"
+      },
+      {
+        id: 63, article: 63, type: "single",
+        question: "根據《香港基本法》第六十三條，香港特別行政區律政司主管甚麼工作？",
+        options: { A: "全港土地規劃管理", B: "公務員薪酬評定", C: "刑事檢控工作", D: "警務維安統籌" },
+        answer: "C",
+        explanation: "香港特別行政區律政司主管刑事檢控工作，不受任何干涉。"
+      },
+      {
+        id: 64, article: 64, type: "multiple",
+        question: "根據《香港基本法》第六十四條，香港特別行政區政府必須遵守法律，對誰負責？\n① 香港特別行政區立法會\n② 依照本法規定通過法案、定期向立法會報告工作\n③ 執行立法會通過並已生效的法律",
+        options: { A: "①、②和③", B: "僅 ①②", C: "僅 ②③", D: "僅 ①③" },
+        answer: "A",
+        explanation: "三項均為特區政府對立法會負責的具體落實方式與原則。"
+      },
+      {
+        id: 65, article: 65, type: "single",
+        question: "根據《香港基本法》第六十五條，原有的甚麼制度在香港特別行政區予以保持，並繼續實施？",
+        options: { A: "土地世襲批租制度", B: "訴訟制度", C: "公務員終身免稅制度", D: "皇家勳章冊封制度" },
+        answer: "B",
+        explanation: "原有的訴訟制度在香港特別行政區予以保持，並繼續實施。"
+      },
+      {
+        id: 66, article: 66, type: "multiple",
+        question: "根據《香港基本法》第六十六條，香港特別行政區立法會是香港特別行政區的甚麼機關？\n① 立法機關\n② 依本法規定行使立法權的機關\n③ 最高權力決策機關",
+        options: { A: "僅 ①②", B: "僅 ②③", C: "僅 ①③", D: "①、②和③" },
+        answer: "A",
+        explanation: "香港特別行政區立法會是香港特別行政區的立法機關。"
+      },
+      {
+        id: 67, article: 67, type: "single",
+        question: "根據《香港基本法》第六十七條，香港特別行政區立法會由甚麼人組成？",
+        options: { A: "中央人民政府指派官員組成", B: "全體在港合法居留之外國僑民組成", C: "由選舉委員會全體委員兼任", D: "香港特別行政區永久性居民組成" },
+        answer: "D",
+        explanation: "立法會由香港特別行政區永久性居民組成。"
+      },
+      {
+        id: 68, article: 68, type: "multiple",
+        question: "根據《香港基本法》第六十八條，關於立法會產生辦法的敘述，下列何者正確？\n① 根據香港特別行政區的實際情況和循序漸進的原則而規定\n② 最終達至全部議員由選舉產生為目標\n③ 立法會產生辦法和法案表決程序規定於本法附件二",
+        options: { A: "①、②和③", B: "僅 ①②", C: "僅 ②③", D: "僅 ①③" },
+        answer: "A",
+        explanation: "三項均符合基本法第六十八條之規定。"
+      },
+      {
+        id: 69, article: 69, type: "single",
+        question: "根據《香港基本法》第六十九條，香港特別行政區立法會除第一屆外，每屆任期幾年？",
+        options: { A: "四年", B: "三年", C: "五年", D: "六年" },
+        answer: "C",
+        explanation: "香港特別行政區立法會除第一屆外，每屆任期四年（後經全國人大常委會修改完善選舉制度後改為五年，此處依基本法條文與修憲精神為本）。"
+      },
+      {
+        id: 70, article: 70, type: "multiple",
+        question: "根據《香港基本法》第七十條，香港特別行政區立法會如遇行政長官解散立法會的情形，重行選出的立法會任期如何？\n① 不受原屆任期限制\n② 為新的一屆四年或五年任期\n③ 由行政長官指定短期任期",
+        options: { A: "僅 ①②", B: "僅 ②③", C: "①、②和③", D: "僅 ①③" },
+        answer: "A",
+        explanation: "重行選出的立法會任期不受原屆任期限制。"
+      },
+      {
+        id: 71, article: 71, type: "single",
+        question: "根據《香港基本法》第七十一條，香港特別行政區立法會主席由誰擔任？",
+        options: { A: "行政長官直接委任", B: "終審法院首席法官兼任", C: "中央政府指定", D: "立法會議員互選產生" },
+        answer: "D",
+        explanation: "香港特別行政區立法會主席由立法會議員互選產生。"
+      },
+      {
+        id: 72, article: 72, type: "multiple",
+        question: "根據《香港基本法》第七十二條，香港特別行政區立法會主席行使下列哪些職權？\n① 主持會議\n② 決定議程\n③ 決定動議辯論時間",
+        options: { A: "僅 ①②", B: "僅 ②③", C: "僅 ①③", D: "①、②和③" },
+        answer: "D",
+        explanation: "三項均為立法會主席法定行使的職權。"
+      },
+      {
+        id: 73, article: 73, type: "single",
+        question: "根據《香港基本法》第七十三條，香港特別行政區立法會行使多項職權，下列何者屬於其職權之一？",
+        options: { A: "指揮全國武裝力量與防務", B: "根據本法規定並依照法定程序制定、修改和廢除法律", C: "任命香港法院各級法官", D: "管理全國對外貿易與外交事務" },
+        answer: "B",
+        explanation: "立法會有權根據本法規定並依照法定程序制定、修改和廢除法律。"
+      },
+      {
+        id: 74, article: 74, type: "multiple",
+        question: "根據《香港基本法》第七十四條，關於立法會議員提出法案的限制，下列何者正確？\n① 立法會議員私人提出有關公共開支的法案須得行政長官的書面同意\n② 有關政治體制或政府政策的法案須得行政長官書面同意\n③ 凡不涉及公共開支或政府政策的法案可由議員自由提出",
+        options: { A: "①、②和③", B: "僅 ①②", C: "僅 ②③", D: "僅 ①③" },
+        answer: "A",
+        explanation: "三項均符合基本法第七十四條對議員私人提出法案之嚴格限制。"
+      },
+      {
+        id: 75, article: 75, type: "single",
+        question: "根據《香港基本法》第七十五條，香港特別行政區立法會舉行會議的法定人數為不少於全體議員的多少？",
+        options: { A: "三分之一", B: "二分之一", C: "三分之二", D: "四分之三" },
+        answer: "B",
+        explanation: "立法會舉行會議的法定人數為不少於全體議員的二分之一。"
+      },
+      {
+        id: 76, article: 76, type: "multiple",
+        question: "根據《香港基本法》第七十六條，香港特別行政區立法會通過的法案，須經甚麼程序方能生效？\n① 行政長官簽署\n② 公布\n③ 報全國人大常委會備案",
+        options: { A: "僅 ①②", B: "僅 ②③", C: "①、②和③", D: "僅 ①③" },
+        answer: "C",
+        explanation: "立法會通過的法案須經行政長官簽署、公布，並報全國人大常委會備案。"
+      },
+      {
+        id: 77, article: 77, type: "single",
+        question: "根據《香港基本法》第七十七條，香港特別行政區立法會議員在立法會會議上的發言是否享有法律豁免權？",
+        options: { A: "不享有任何言論保障", B: "僅限於批評內地政策時享有", C: "享有法律追究豁免權", D: "由行政長官決定是否起訴" },
+        answer: "C",
+        explanation: "香港特別行政區立法會議員在立法會會議上的發言，不受法律追究。"
+      },
+      {
+        id: 78, article: 78, type: "multiple",
+        question: "根據《香港基本法》第七十八條，關於立法會議員被逮捕的限制，下列何者正確？\n① 非經立法會主席批准，立法會議員在出席會議或前往會議途中不受逮捕\n② 刑事現行犯除外\n③ 任何情況下皆可由警方直接拘捕",
+        options: { A: "僅 ②③", B: "僅 ①③", C: "僅 ①②", D: "①、②和③" },
+        answer: "C",
+        explanation: "非經立法會主席批准，議員在出席會議或前往途中不受逮捕（刑事現行犯除外）。"
+      },
+      {
+        id: 79, article: 79, type: "single",
+        question: "根據《香港基本法》第七十九條，立法會議員如有嚴重違規或喪失資格情形，由誰宣佈其喪失議員資格？",
+        options: { A: "行政長官", B: "立法會主席", C: "終審法院首席法官", D: "選舉委員會" },
+        answer: "B",
+        explanation: "立法會議員如有本條規定的情形，由立法會主席宣告其喪失議員資格。"
+      },
+      {
+        id: 80, article: 80, type: "multiple",
+        question: "根據《香港基本法》第八十條，香港特別行政區各級法院是香港特別行政區的甚麼機關？\n① 司法機關\n② 行使香港的審判權\n③ 獨立於行政與立法機關",
+        options: { A: "僅 ①②", B: "僅 ②③", C: "①、②和③", D: "僅 ①③" },
+        answer: "C",
+        explanation: "三項均為香港各級法院之性質與審判權力定位。"
+      }
     ];
 
     async function importData() {
       const statusEl = document.getElementById('status');
       try {
-        for (let q of part2Questions) {
+        statusEl.innerText = "正在將第 41-80 條（選項隨機化版本）寫入 Firestore...";
+        for (let q of questionsPart2) {
           await setDoc(doc(db, "questions_bl", `q_${q.id}`), q);
         }
-        statusEl.innerText = "成功！所有複合題已全面升級為 3 個選項組合，並已寫入 Firestore。";
+        statusEl.innerText = "成功！第 41-80 條已完成選項隨機化並寫入 Firestore！";
         statusEl.style.color = "green";
       } catch (error) {
         statusEl.innerText = "寫入失敗：" + error.message;
         statusEl.style.color = "red";
       }
     }
+
     importData();
   </script>
 </body>

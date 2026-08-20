@@ -26,7 +26,7 @@
                 <div class="card">
                     <div class="card-header text-primary">執行匯入操作</div>
                     <div class="card-body p-4">
-                        <p class="text-muted mb-4">本頁面將自動載入共用的 Firebase 設定，並將基本法第 1 批 (1-40題) 寫入 Firestore 的 <code>questions_bl</code> 集合。</p>
+                        <p class="text-muted mb-4">點擊下方按鈕可預覽資料或開始寫入至 Firestore 的 <code>questions_bl</code> 集合。</p>
                         <div class="d-flex gap-3">
                             <button type="button" class="btn btn-outline-secondary px-4" id="previewBtn">預覽第 1 批 JSON 資料</button>
                             <button type="button" class="btn btn-primary px-4" id="importBtn">開始匯入至 questions_bl</button>
@@ -46,13 +46,14 @@
         </div>
     </div>
 
-    <!-- 載入 Firebase 模組與外部設定檔 (與 import_nsl_part1.html 一致) -->
+    <!-- Firebase SDK 與匯入邏輯 -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        // 嘗試引入共用設定，若您的環境因 CORS 阻擋，可直接將設定寫在此處
         import { firebaseConfig } from "./firebase-config.js";
 
-        // 基本法第 1 至 40 條題目資料產生器
+        // 基本法第 1 至 40 條題目資料
         function getPart1Questions() {
             return [
                 {
@@ -298,60 +299,63 @@
             ];
         }
 
-        // 預覽按鈕事件
-        document.getElementById('previewBtn').addEventListener('click', function() {
-            const resultCard = document.getElementById('resultCard');
-            const statusAlert = document.getElementById('statusAlert');
-            const jsonOutput = document.getElementById('jsonOutput');
+        // 綁定事件監聽器
+        document.addEventListener('DOMContentLoaded', () => {
+            // 預覽按鈕事件
+            document.getElementById('previewBtn').addEventListener('click', function() {
+                const resultCard = document.getElementById('resultCard');
+                const statusAlert = document.getElementById('statusAlert');
+                const jsonOutput = document.getElementById('jsonOutput');
 
-            resultCard.style.display = 'block';
-            statusAlert.style.display = 'none';
-            document.getElementById('resultCardHeader').textContent = "資料預覽：第 1 批 (1-40條)";
+                resultCard.style.display = 'block';
+                statusAlert.style.display = 'none';
+                document.getElementById('resultCardHeader').textContent = "資料預覽：第 1 批 (1-40條)";
 
-            const data = getPart1Questions();
-            jsonOutput.textContent = JSON.stringify(data, null, 4);
-        });
+                const data = getPart1Questions();
+                jsonOutput.textContent = JSON.stringify(data, null, 4);
+            });
 
-        // 匯入按鈕事件
-        document.getElementById('importBtn').addEventListener('click', async function() {
-            const resultCard = document.getElementById('resultCard');
-            const statusAlert = document.getElementById('statusAlert');
-            const jsonOutput = document.getElementById('jsonOutput');
+            // 匯入按鈕事件
+            document.getElementById('importBtn').addEventListener('click', async function() {
+                const resultCard = document.getElementById('resultCard');
+                const statusAlert = document.getElementById('statusAlert');
+                const jsonOutput = document.getElementById('jsonOutput');
 
-            resultCard.style.display = 'block';
-            statusAlert.style.display = 'block';
-            statusAlert.className = "alert alert-warning";
-            statusAlert.textContent = "正在連線至 Firebase 並寫入資料至 `questions_bl`...";
+                resultCard.style.display = 'block';
+                statusAlert.style.display = 'block';
+                statusAlert.className = "alert alert-warning";
+                statusAlert.textContent = "正在連線至 Firebase 並寫入資料至 `questions_bl`...";
 
-            try {
-                const app = initializeApp(firebaseConfig);
-                const db = getFirestore(app);
-                const questions = getPart1Questions();
+                try {
+                    const app = initializeApp(firebaseConfig);
+                    const db = getFirestore(app);
+                    const questions = getPart1Questions();
 
-                let successCount = 0;
-                for (const q of questions) {
-                    const docRef = doc(db, "questions_bl", String(q.id));
-                    await setDoc(docRef, q);
-                    successCount++;
+                    let successCount = 0;
+                    for (const q of questions) {
+                        const docRef = doc(db, "questions_bl", String(q.id));
+                        await setDoc(docRef, q);
+                        successCount++;
+                    }
+
+                    statusAlert.className = "alert alert-success";
+                    statusAlert.textContent = `成功！第 1 批 (1-40題) 已全數寫入 Firestore 的 \`questions_bl\` 集合！`;
+                    jsonOutput.textContent = JSON.stringify({
+                        status: "success",
+                        collection: "questions_bl",
+                        total_imported: successCount,
+                        timestamp: new Date().toISOString()
+                    }, null, 4);
+
+                } catch (error) {
+                    statusAlert.className = "alert alert-danger";
+                    statusAlert.textContent = `寫入失敗：${error.message}`;
+                    jsonOutput.textContent = JSON.stringify({
+                        error_code: error.code,
+                        error_message: error.message
+                    }, null, 4);
                 }
-
-                statusAlert.className = "alert alert-success";
-                statusAlert.textContent = `成功！第 1 批 (1-40題) 已全數寫入 Firestore 的 \`questions_bl\` 集合！`;
-                jsonOutput.textContent = JSON.stringify({
-                    status: "success",
-                    collection: "questions_bl",
-                    total_imported: successCount,
-                    timestamp: new Date().toISOString()
-                }, null, 4);
-
-            } catch (error) {
-                statusAlert.className = "alert alert-danger";
-                statusAlert.textContent = `寫入失敗：${error.message}`;
-                jsonOutput.textContent = JSON.stringify({
-                    error_code: error.code,
-                    error_message: error.message
-                }, null, 4);
-            }
+            });
         });
     </script>
 </body>

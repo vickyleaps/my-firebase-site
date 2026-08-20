@@ -863,34 +863,43 @@
    // questions_nsl = allQuestions;
    // localStorage.setItem('questions_nsl', JSON.stringify(questions_nsl));
 
-// 一次性寫入 Firebase Firestore
-    async function uploadToFirestore() {
-          const db = firebase.firestore();
-    const batch = db.batch();
-    const statusEl = document.getElementById('status');
-
-    async function uploadToFirestore() {
-      try {
-        if (typeof allQuestions === 'undefined' || allQuestions.length === 0) {
-          statusEl.innerText = '錯誤：找不到 allQuestions 陣列或資料為空！';
-          return;
-        }
-
-        allQuestions.forEach((q, index) => {
-          const docRef = db.collection('questions_nsl').doc(`q_${index + 1}`);
-          batch.set(docRef, q);
-        });
-
-        await batch.commit();
-        statusEl.innerText = `成功匯入 ${allQuestions.length} 道國安法題目至 Firebase Firestore！`;
-        console.log("Firestore 批量寫入成功！");
-      } catch (error) {
-        statusEl.innerText = `寫入失敗：${error.message}`;
-        console.error("寫入錯誤詳情：", error);
-      }
+    // 一次性寫入 Firebase Firestore
+async function uploadToFirestore() {
+  const statusEl = document.getElementById('status');
+  
+  try {
+    // 檢查 Firebase 是否載入
+    if (typeof firebase === 'undefined') {
+      throw new Error("Firebase SDK 未載入");
     }
 
-    uploadToFirestore();
-  </script>
+    const db = firebase.firestore();
+    const batch = db.batch();
+
+    // 檢查資料
+    if (typeof allQuestions === 'undefined' || allQuestions.length === 0) {
+      statusEl.innerText = '錯誤：找不到 allQuestions 陣列或資料為空！';
+      return;
+    }
+
+    // 批量處理
+    allQuestions.forEach((q, index) => {
+      const docRef = db.collection('questions_nsl').doc(`q_${index + 1}`);
+      batch.set(docRef, q);
+    });
+
+    await batch.commit();
+    statusEl.innerText = `成功匯入 ${allQuestions.length} 道國安法題目至 Firebase Firestore！`;
+    console.log("Firestore 批量寫入成功！");
+    
+  } catch (error) {
+    statusEl.innerText = `寫入失敗：${error.message}`;
+    console.error("寫入錯誤詳情：", error);
+  }
+}
+
+// 執行寫入
+uploadToFirestore();
+</script>
 </body>
 </html>

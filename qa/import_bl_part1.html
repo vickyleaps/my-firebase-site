@@ -11,7 +11,6 @@
         .card { border: none; border-radius: 12px; box-shadow: 0 6px 12px rgba(0,0,0,0.08); margin-bottom: 24px; }
         .card-header { background-color: #fff; border-bottom: 1px solid #eaeaea; font-weight: bold; border-top-left-radius: 12px !important; border-top-right-radius: 12px !important; padding: 16px 20px; }
         pre { background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; max-height: 450px; font-size: 13px; }
-        .form-label { font-weight: 600; color: #333; }
     </style>
 </head>
 <body>
@@ -23,29 +22,11 @@
 
         <div class="row justify-content-center">
             <div class="col-lg-10">
-                <!-- Firebase 設定卡片 -->
+                <!-- 操作卡片 -->
                 <div class="card">
-                    <div class="card-header text-primary">1. Firebase 專案設定</div>
+                    <div class="card-header text-primary">執行匯入操作</div>
                     <div class="card-body p-4">
-                        <div class="mb-3">
-                            <label for="firebaseConfig" class="form-label">貼上您的 Firebase Config (JSON)：</label>
-                            <textarea class="form-control font-monospace" id="firebaseConfig" rows="6" placeholder='{
-  "apiKey": "你的API_KEY",
-  "authDomain": "你的專案.firebaseapp.com",
-  "projectId": "你的專案ID",
-  "storageBucket": "你的專案.appspot.com",
-  "messagingSenderId": "...",
-  "appId": "..."
-}'></textarea>
-                            <div class="form-text">與您匯入國安法時使用的 Firebase 專案設定相同。</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 動作與操作卡片 -->
-                <div class="card">
-                    <div class="card-header text-primary">2. 執行匯入操作</div>
-                    <div class="card-body p-4">
+                        <p class="text-muted mb-4">本頁面將自動載入共用的 Firebase 設定，並將基本法第 1 批 (1-40題) 寫入 Firestore 的 <code>questions_bl</code> 集合。</p>
                         <div class="d-flex gap-3">
                             <button type="button" class="btn btn-outline-secondary px-4" id="previewBtn">預覽第 1 批 JSON 資料</button>
                             <button type="button" class="btn btn-primary px-4" id="importBtn">開始匯入至 questions_bl</button>
@@ -65,10 +46,11 @@
         </div>
     </div>
 
-    <!-- 載入 Firebase 模組 (與 import_nsl_part1.html 相同邏輯) -->
+    <!-- 載入 Firebase 模組與外部設定檔 (與 import_nsl_part1.html 一致) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { firebaseConfig } from "./firebase-config.js";
 
         // 基本法第 1 至 40 條題目資料產生器
         function getPart1Questions() {
@@ -330,31 +312,14 @@
             jsonOutput.textContent = JSON.stringify(data, null, 4);
         });
 
-        // 匯入按鈕事件 (直接寫入 Firestore questions_bl)
+        // 匯入按鈕事件
         document.getElementById('importBtn').addEventListener('click', async function() {
             const resultCard = document.getElementById('resultCard');
             const statusAlert = document.getElementById('statusAlert');
             const jsonOutput = document.getElementById('jsonOutput');
-            const configInput = document.getElementById('firebaseConfig').value.trim();
 
             resultCard.style.display = 'block';
             statusAlert.style.display = 'block';
-
-            if (!configInput) {
-                statusAlert.className = "alert alert-danger";
-                statusAlert.textContent = "錯誤：請先貼上你的 Firebase Config 設定！";
-                return;
-            }
-
-            let firebaseConfig;
-            try {
-                firebaseConfig = JSON.parse(configInput);
-            } catch (e) {
-                statusAlert.className = "alert alert-danger";
-                statusAlert.textContent = "錯誤：Firebase Config 格式不正確，必須是有效的 JSON 格式。";
-                return;
-            }
-
             statusAlert.className = "alert alert-warning";
             statusAlert.textContent = "正在連線至 Firebase 並寫入資料至 `questions_bl`...";
 
@@ -364,7 +329,6 @@
                 const questions = getPart1Questions();
 
                 let successCount = 0;
-                // 逐筆以文件 ID (對應題目 id) 寫入 Firestore 集合 questions_bl
                 for (const q of questions) {
                     const docRef = doc(db, "questions_bl", String(q.id));
                     await setDoc(docRef, q);

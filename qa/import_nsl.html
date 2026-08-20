@@ -860,9 +860,36 @@
     ];
 
     // 一次性寫入 LocalStorage
-    questions_nsl = allQuestions;
-    localStorage.setItem('questions_nsl', JSON.stringify(questions_nsl));
+   // questions_nsl = allQuestions;
+   // localStorage.setItem('questions_nsl', JSON.stringify(questions_nsl));
 
+// 一次性寫入 Firebase Firestore
+    async function uploadToFirestore() {
+    const db = firebase.firestore();
+    const batch = db.batch();
+    
+    allQuestions.forEach((q, index) => {
+        // 在 Firestore 的 'questions_nsl' 集合中建立文件 q_1, q_2 ...
+        const docRef = db.collection('questions_nsl').doc(`q_${index + 1}`);
+        batch.set(docRef, q);
+    });
+
+    try {
+        await batch.commit();
+        document.getElementById('status').innerText = `成功寫入 ${allQuestions.length} 道國安法題目至 Firebase Firestore！`;
+        console.log("Firestore 批量寫入成功！");
+    } catch (error) {
+        document.getElementById('status').innerText = `寫入失敗：${error.message}`;
+        console.error("寫入錯誤：", error);
+    }
+}
+
+// 執行寫入
+uploadToFirestore();
+
+
+
+    
     document.getElementById('status').innerText = `成功匯入 ${questions_nsl.length} 道國安法題目（第 1 至 64 條全數涵蓋）！`;
     console.log(`成功匯入 ${questions_nsl.length} 道題目。`);
   </script>

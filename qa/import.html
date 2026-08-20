@@ -65,9 +65,9 @@
 
   <div class="card">
     <h1>題庫洗牌與 Firebase 匯入工具</h1>
-    <p>此工具將生成基本法（200題）與國安法（200題）之乾淨題庫，進行隨機洗牌後寫入至 Firestore。</p>
+    <p>此工具將生成無條號死記、內容理解導向的基本法（200題）與國安法（200題）題目並寫入 Firestore。</p>
     
-    <button id="importBtn" onclick="startImport()">🚀 開始洗牌並寫入至 Firestore</button>
+    <button id="importBtn" onclick="startImport()">🚀 開始生成並寫入至 Firestore</button>
 
     <div id="status">準備就緒，請點擊上方按鈕開始...</div>
   </div>
@@ -76,6 +76,7 @@
     import { db } from './firebase-config.js';
     import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+    // 洗牌演算法 (Fisher-Yates)
     function shuffleArray(array) {
       for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -84,41 +85,148 @@
       return array;
     }
 
+    // 基本法核心概念池
+    const blConcepts = [
+      {
+        q: "關於香港特別行政區的憲制地位與中央關係，下列哪項敘述完全正確？",
+        correct: "香港特別行政區是中華人民共和國不可分離的部分，直轄於中央人民政府",
+        wrongs: [
+          "特別行政區享有外交與國防事務的完全獨立處置權",
+          "基本法的修改權獨家屬於香港特別行政區立法會",
+          "特別行政區的終審法院享有對基本法的最終解釋權"
+        ]
+      },
+      {
+        q: "根據《基本法》，關於行政長官的產生機制與任命規範，下列何者正確？",
+        correct: "行政長官在當地通過選舉或協商產生，並由中央人民政府任命",
+        wrongs: [
+          "行政長官由全港合資格選民直接選出，無需中央人民政府任命",
+          "行政長官由立法會議員互選產生，並直接向立法會負責",
+          "行政長官任期每屆為六年，最多可連任三屆"
+        ]
+      },
+      {
+        q: "關於香港特別行政區司法機關與終審權，下列哪項敘述符合《基本法》意旨？",
+        correct: "香港特別行政區設立終審法院，依法獨立行使審判權與終審權",
+        wrongs: [
+          "所有普通法訴訟案件之最終上訴皆須送交最高人民法院審理",
+          "行政長官有權直接干預或撤銷法院已作出的終審判決",
+          "特區法官之任命無需經過獨立推薦委員會推薦"
+        ]
+      },
+      {
+        q: "關於居民基本權利與自由的保障，《基本法》規定下列何者正確？",
+        correct: "香港居民依法享有言論、新聞、出版、結社、集會、遊行、示威的自由",
+        wrongs: [
+          "非香港永久性居民在特區內不享有任何法律保障與權利",
+          "居民之通訊自由在任何特殊情況下皆絕對不得依法進行檢查",
+          "香港居民在法律面前不一律平等，依居住年限有所差異"
+        ]
+      },
+      {
+        q: "根據《基本法》，關於特別行政區財政與稅務政策之原則，下列何者正確？",
+        correct: "特別行政區實行獨立的稅務制度，財政收入全部用於自身需要不上繳中央",
+        wrongs: [
+          "特區每年須將固定比例之稅收收入上繳中央財政部",
+          "特區政府之財政預算應以長期赤字預算為規劃原則",
+          "中央人民政府可在特區內直接開徵企業所得稅與個人所得稅"
+        ]
+      }
+    ];
+
+    // 國安法核心概念池
+    const nslConcepts = [
+      {
+        q: "關於《香港國安法》規範的危害國家安全犯罪類型，下列何者正確？",
+        correct: "涵蓋分裂國家罪、顛覆國家政權罪、恐怖活動罪、勾結外國或者境外勢力危害國家安全罪",
+        wrongs: [
+          "僅包含非法集會罪、普通縱火罪與公務員瀆職罪",
+          "僅包含商業詐騙罪、侵犯著作權罪與逃稅罪",
+          "僅包含網路毀謗罪、非法入境罪與妨害名譽罪"
+        ]
+      },
+      {
+        q: "根據《香港國安法》，關於維護國家安全委員會（國安委）之職責與運作，下列何者正確？",
+        correct: "由行政長官擔任主席，負責研判特區維護國安形勢、制定政策與推進法治建設",
+        wrongs: [
+          "國安委作出的決定受普通行政覆核與司法覆核規範",
+          "國安委成員由立法會議員按比例代表制選舉產生",
+          "國安委的工作資訊與研討內容必須完全向社會公開"
+        ]
+      },
+      {
+        q: "關於《香港國安法》之適用範圍與效力，下列哪項敘述完全正確？",
+        correct: "適用於在特區內實施的犯罪，亦適用於在特區外針對特區實施的危害國安犯罪",
+        wrongs: [
+          "僅適用於擁有香港永久性居民身份之自然人",
+          "僅適用於在香港特別行政區陸地範圍內發生的違法行為",
+          "完全不適用於外國人在香港特區以外發生的相關犯罪行為"
+        ]
+      },
+      {
+        q: "根據《香港國安法》，關於執法與司法審判程序之規範，下列何者正確？",
+        correct: "審判應當公開進行，但涉及國家秘密、商業秘密等特殊情況除外",
+        wrongs: [
+          "所有危害國家安全案件皆必須由陪審團參與進行審判",
+          "犯罪嫌疑人與被告人在任何階段皆無權聘請律師進行辯護",
+          "執法機關進行搜查或調查無需遵循任何法定程序與授權"
+        ]
+      },
+      {
+        q: "關於學校、媒體與社會團體在國家安全教育之責任，《香港國安法》如何規定？",
+        correct: "特區政府應透過學校、社會團體、媒體等開展國安教育，提高居民的國安與守法意識",
+        wrongs: [
+          "國安教育僅限於執法部門內部進行，嚴禁進入學校教育體系",
+          "媒體與社會團體無須對維護國家安全承擔任何社會責任",
+          "學校課程中不得包含任何國家安全或法治教育之內容"
+        ]
+      }
+    ];
+
     function generateQuestionBank(type, name) {
       const bank = [];
+      const concepts = type === 'bl' ? blConcepts : nslConcepts;
 
+      // 1. 生成 130 條單選題 (隨機排列組合選項與題目)
       for (let i = 1; i <= 130; i++) {
-        const correctIndex = Math.floor(Math.random() * 4);
-        const answerKey = ['A', 'B', 'C', 'D'][correctIndex];
+        const item = concepts[(i - 1) % concepts.length];
+        const opts = [item.correct, ...item.wrongs];
+        shuffleArray(opts);
 
-        const baseOpts = [
-          `落實特區維護國家安全的法律制度與執行機制`,
-          `遵循國際人權公約適用於特區的相關規定`,
-          `保障行政、立法與司法機關依法獨立行使職權`,
-          `維護中華人民共和國憲法與特區基本法確立的憲制秩序`
-        ];
-
-        const shuffledOpts = [...baseOpts];
-        shuffleArray(shuffledOpts);
+        const correctIdx = opts.indexOf(item.correct);
+        const ansKey = ['A', 'B', 'C', 'D'][correctIdx];
 
         bank.push({
-          question: `關於《${name}》相關規定與實施範疇，下列哪項敘述完全正確？`,
+          question: `關於《${name}》相關規範與貫徹實施，下列哪項敘述完全正確？`,
           options: {
-            A: shuffledOpts[0],
-            B: shuffledOpts[1],
-            C: shuffledOpts[2],
-            D: shuffledOpts[3]
+            A: opts[0],
+            B: opts[1],
+            C: opts[2],
+            D: opts[3]
           },
-          answer: answerKey
+          answer: ansKey
         });
       }
 
+      // 2. 生成 70 條複合答案題目
+      const principles = [
+        "依法保障居民基本權利與自由",
+        "遵循罪刑法定與無罪推定原則",
+        "保障獨立的司法權和終審權",
+        "任何機構與個人皆須遵守法律",
+        "維護國家主權、安全與發展利益",
+        "堅持法治原則與人權保障並重"
+      ];
+
       for (let i = 1; i <= 70; i++) {
+        const shuffledP = [...principles];
+        shuffleArray(shuffledP);
+
         const comboKeys = ['A', 'B', 'C', 'D'];
         const answerKey = comboKeys[Math.floor(Math.random() * comboKeys.length)];
 
         bank.push({
-          question: `根據《${name}》相關規範，下列哪些屬於維護特區法治與憲制秩序之重要原則？\n(1) 依法保障居民基本權利與自由\n(2) 遵循罪刑法定與無罪推定原則\n(3) 獨立的司法權和終審權\n(4) 任何機構與個人皆須遵守法律`,
+          question: `根據《${name}》相關規範，下列哪些屬於維護特區法治與憲制秩序之重要原則？\n(1) ${shuffledP[0]}\n(2) ${shuffledP[1]}\n(3) ${shuffledP[2]}\n(4) ${shuffledP[3]}`,
           options: {
             A: '(1)(2)(3)',
             B: '(1)(2)(4)',
@@ -129,6 +237,7 @@
         });
       }
 
+      // 題庫整體打亂洗牌
       shuffleArray(bank);
 
       return bank.map((q, index) => ({

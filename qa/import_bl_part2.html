@@ -5,8 +5,11 @@
   <title>Import BL Questions - Revised 41-80</title>
 </head>
 <body style="font-family: sans-serif; text-align: center; margin-top: 50px;">
-  <h1>香港基本法題目匯入 (第 41-80 條 高難度優化版)</h1>
-  <p id="status" style="font-size: 18px; color: #333;">正在寫入 41-80 條資料到 Firestore...</p>
+  <h1>香港基本法題目匯入 (第 41-80 條 優化穩定版)</h1>
+  <p id="status" style="font-size: 18px; color: #333;">準備開始寫入 41-80 條資料到 Firestore...</p>
+  <div style="width: 80%; max-width: 500px; background: #ddd; margin: 20px auto; border-radius: 5px; overflow: hidden;">
+    <div id="progress-bar" style="width: 0%; height: 20px; background: #4CAF50; transition: width 0.3s;"></div>
+  </div>
 
   <script type="module">
     import { db } from './firebase-config.js';
@@ -23,7 +26,7 @@
       { id: 48, article: 48, type: "multiple", question: "行政長官職權包括：① 領導特區政府 ② 負責處理中央外交事務 ③ 簽署並公佈法案", options: { A: "僅 ①②", B: "僅 ①③", C: "僅 ②③", D: "①、②和③" }, answer: "B", explanation: "外交事務屬中央管理。" },
       { id: 49, article: 49, type: "single", question: "行政長官若認為立法會通過的法案不符合整體利益，可將法案發還給誰？", options: { A: "行政會議", B: "立法會", C: "人大常委會", D: "律政司" }, answer: "B", explanation: "可發還立法會重議。" },
       { id: 50, article: 50, type: "multiple", question: "解散立法會條件：① 拒絕通過預算案 ② 行政長官在一年內可解散多次 ③ 解散前須諮詢行政會議", options: { A: "僅 ①", B: "僅 ①③", C: "僅 ②③", D: "①、②和③" }, answer: "A", explanation: "一年內只能解散一次。" },
-      { id: 51, article: 51, type: "single", question: "立法會拒絕批准財政預算案時，行政長官可申請？", options: { A: "中央補貼", B: "臨時撥款", C: "發行國債", D: "特別稅收", answer: "B", explanation: "可申請臨時撥款。" },
+      { id: 51, article: 51, type: "single", question: "立法會拒絕批准財政預算案時，行政長官可申請？", options: { A: "中央補貼", B: "臨時撥款", C: "發行國債", D: "特別稅收" }, answer: "B", explanation: "可申請臨時撥款。" },
       { id: 52, article: 52, type: "multiple", question: "行政長官必須辭職的情形：① 因嚴重疾病無法履職 ② 拒絕簽署立法會重行通過的法案 ③ 立法會重選後仍拒絕通過原議案", options: { A: "僅 ①②", B: "僅 ①③", C: "僅 ②③", D: "①、②和③" }, answer: "C", explanation: "因病辭職是自行辭職，非必須（由彈劾機制處理）。" },
       { id: 53, article: 53, type: "single", question: "行政長官不能履職時，由誰暫行代理？", options: { A: "政務司、財政司、律政司序列", B: "立法會主席", C: "行政會議召集人", D: "終審法院院長" }, answer: "A", explanation: "由三司長按序列代理。" },
       { id: 54, article: 54, type: "multiple", question: "關於行政會議：① 是協助特首決策的機構 ② 成員由特首指定人員兼任 ③ 由特首主持", options: { A: "僅 ①③", B: "僅 ①②", C: "僅 ②③", D: "①、②和③" }, answer: "A", explanation: "成員由特首委任，非指定人員。" },
@@ -57,15 +60,28 @@
 
     async function importData() {
       const statusEl = document.getElementById('status');
+      const progressBar = document.getElementById('progress-bar');
+      const total = questions.length;
+      
       try {
-        for (let q of questions) {
+        for (let i = 0; i < total; i++) {
+          let q = questions[i];
+          statusEl.innerText = `正在寫入第 ${i + 1} / ${total} 筆資料 (q_${q.id})...`;
+          
           await setDoc(doc(db, "questions_bl", `q_${q.id}`), q);
+          
+          let percent = ((i + 1) / total) * 100;
+          progressBar.style.width = percent + "%";
         }
-        statusEl.innerText = "成功！題目已優化，減少三項皆是，干擾度已提升。";
+        statusEl.innerText = "全部寫入成功！第 41-80 條已順利更新至 Firestore。";
+        progressBar.style.background = "#2196F3";
       } catch (error) {
-        statusEl.innerText = "失敗：" + error.message;
+        console.error("寫入錯誤：", error);
+        statusEl.innerText = "寫入失敗：" + error.message;
+        progressBar.style.background = "#f44336";
       }
     }
+    
     importData();
   </script>
 </body>

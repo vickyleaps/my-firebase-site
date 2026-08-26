@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <title>Import BL Questions - Part 3 (81-120)</title>
+</head>
+<body style="font-family: sans-serif; text-align: center; margin-top: 50px;">
+  <h1>香港基本法題目匯入 (第 81-120 條 穩定進度版)</h1>
+  <p id="status" style="font-size: 18px; color: #333;">準備開始寫入 81-120 條資料到 Firestore...</p>
+  <div style="width: 80%; max-width: 500px; background: #ddd; margin: 20px auto; border-radius: 5px; overflow: hidden;">
+    <div id="progress-bar" style="width: 0%; height: 20px; background: #4CAF50; transition: width 0.3s;"></div>
+  </div>
+
+  <script type="module">
+    import { db } from './firebase-config.js';
+    import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const questions = [
+      { id: 81, article: 81, type: "single", question: "根據《香港基本法》第八十一條，香港特區設立原訟法庭、上訴法庭以及甚麼？", options: { A: "最高人民法院", B: "終審法院", C: "行政裁判司署", D: "懲教署法庭" }, answer: "B", explanation: "香港特別行政區設有終審法院、高等法院（分設原訟法庭和上訴法庭）、區域法院、裁判法院及其他專門法庭。" },
+      { id: 82, article: 82, type: "multiple", question: "根據《香港基本法》第八十二條，關於終審法院的敘述何者正確？① 終審權屬於香港特區終審法院 ② 可根據需要邀請其他普通法適用地區法官參加審判 ③ 終審法院審判權受全國人大常委會日常案件審查", options: { A: "僅 ①②", B: "僅 ①③", C: "僅 ②③", D: "①、②和③" }, answer: "A", explanation: "終審法院可根據需要邀請其他普通法適用地區法官參加審判；香港特區的終審權屬於香港特區終審法院。" },
+      { id: 83, article: 83, type: "single", question: "根據《香港基本法》第八十三條，香港特別行政區各級法院的組織和職權由甚麼規定？", options: { A: "全國人大常委會決議", B: "行政長官命令", C: "本地法律", D: "普通法慣例" }, answer: "C", explanation: "香港特別行政區各級法院的組織和職權由法律（本地法律）規定。" },
+      { id: 84, article: 84, type: "multiple", question: "根據《香港基本法》第八十四條，香港特區法院審判案件時：① 應參照其他普通法適用地區的判例 ② 以香港法律為依據 ③ 可引用全國性法律於任何情況", options: { A: "僅 ①③", B: "僅 ①②", C: "僅 ②③", D: "①、②和③" }, answer: "B", explanation: "法院以香港法律為依據，並可參考其他普通法適用地區的司法判例。" },
+      { id: 85, article: 85, type: "single", question: "根據《香港基本法》第八十五條，香港特區法院應怎樣進行審判，不受任何干涉？", options: { A: "獨立進行", B: "受政務司監督", C: "配合行政機關政策", D: "經中央政府指導" }, answer: "A", explanation: "香港特別行政區法院獨立進行審判，不受任何干涉。" },
+      { id: 86, article: 86, type: "multiple", question: "根據《香港基本法》第八十六條，原有的審判制度：① 予以保持 ② 陪審制度的原則予以保留 ③ 須全面改為內地陪審制", options: { A: "僅 ①②", B: "僅 ①③", C: "僅 ②③", D: "①、②和③" }, answer: "A", explanation: "原有的審判制度和陪審制度的原則予以保持。" },
+      { id: 87, article: 87, type: "single", question: "根據《香港基本法》第八十七條，在香港被起訴的人享有甚麼權利？", options: { A: "無條件保釋權", B: "盡早接受公開審判的權利", C: "免除所有刑事責任權", D: "指定陪審員權" }, answer: "B", explanation: "在香港被起訴的人有權盡早接受公開審判。" },
+      { id: 88, article: 88, type: "multiple", question: "根據《香港基本法》第八十八條，香港特區法官根據甚麼原則予以任命？", options: { A: "由當地法官和法律界代表組成的獨立委員會推薦", B: "由行政長官任命", C: "由全體立法會議員投票選舉", D: "由中央直接委派" }, answer: "A", explanation: "法官是根據當地法官和法律界及其他方面代表所組成的獨立委員會的推薦，由行政長官任命的。" },
+      { id: 89, article: 89, type: "single", question: "根據《香港基本法》第八十九條，香港特區法官只有在甚麼情況下方可被免職？", options: { A: "年滿六十歲", B: "無力履職或行為不檢", C: "行政長官認為其施政不配合", D: "立法會通過不信任動議" }, answer: "B", explanation: "法官只有在無力履職或行為不檢的情況下，行政長官才可根據特首任命的審議法官免職的RIBUNAL建議予以免職。" },
+      { id: 90, article: 90, type: "multiple", question: "根據《香港基本法》第九十條，關於終審法院和高等法院首席法官：① 必須由在外國無居留權的香港特別行政區永久性居民中的中國公民擔任 ② 任命時須由行政長官報全國人大常委會備案 ③ 任命無需中央知悉", options: { A: "僅 ①②", B: "僅 ①③", C: "僅 ②③", D: "①、②和③" }, answer: "A", explanation: "終審法院和高等法院首席法官的任命或免職，須由行政長官徵得立法會同意並報全國人大常委會備案。" },
+      { id: 91, article: 91, type: "single", question: "根據《香港基本法》第九十一條，香港特區各級法院的法官和其他司法人員的錄用，應當根據甚麼標準？", options: { A: "其政治忠誠度", B: "其本人的司法和專業才能", C: "其在內地的執業年資", D: "其國籍與種族" }, answer: "B", explanation: "應當根據其本人的司法和專業才能招用。" },
+      { id: 92, article: 92, type: "multiple", question: "根據《香港基本法》第九十二條，香港特區的法官和其他司法人員：① 可以從其他普通法適用地區聘用 ② 必須全部為本地出生公民 ③ 享有與原有制度相若的薪酬待遇", options: { A: "僅 ①②", B: "僅 ①③", C: "僅 ②③", D: "①、②和③" }, answer: "B", explanation: "法官和其他司法人員可以從其他普通法適用地區聘用。" },
+      { id: 93, article: 93, type: "single", question: "根據《香港基本法》第九十三條，香港原有司法人員的退休金、津貼等權益如何？", options: { A: "予以取消", B: "依法受到保護", C: "改由中央財政發放", D: "由特首隨時調整" }, answer: "B", explanation: "原有司法人員的退休金、優待、津貼等予以保護。" },
+      { id: 94, article: 94, type: "multiple", question: "根據《香港基本法》第九十四條，關於香港的律師制度：① 香港特區原有關於律師執業的規定予以保持 ② 在香港執業的律師可享有原有權益和特權 ③ 律師資格統一由內地司法部審批", options: { A: "僅 ①②", B: "僅 ①③", C: "僅 ②③", D: "①、②和③" }, answer: "A", explanation: "香港特區原有關於律師執業和取得執業資格的規定予以保持。" },
+      { id: 95, article: 95, type: "single", question: "根據《香港基本法》第九十五條，香港特區可與全國其他地區的司法機關通過甚麼方式進行司法聯絡和相互協助？", options: { A: "協商", B: "上級法院命令", C: "全國人大仲裁", D: "外交部統籌" }, answer: "A", explanation: "香港特別行政區可與全國其他地區的司法機關通過協商依法進行司法聯絡和相互協助。" },
+      { id: 96, article: 96, type: "multiple", question: "根據《香港基本法》第九十六條，在中央人民政府協助或授權下，特區政府可與外國就甚麼事項締結司法互助協議？", options: { A: "刑事司法互助", B: "外交條約簽署", C: "軍事同盟", D: "關稅同盟" }, answer: "A", explanation: "在中央人民政府協助或授權下，香港特區可與外國就刑事司法互助關係作出適當安排。" },
+      { id: 97, article: 97, type: "single", question: "根據《香港基本法》第九十七條，香港特區可設立甚麼非政權性區域組織？", options: { A: "各級區議會或其他區域組織", B: "地方自衛隊", C: "省級行政公署", D: "地方稅務局" }, answer: "A", explanation: "香港特別行政區可設立非政權性的區域組織，接受特區政府就有關地區管理事務的諮詢..." },
+      { id: 98, article: 98, type: "multiple", question: "根據《香港基本法》第九十八條，區域組織的職能與產生辦法由甚麼規定？", options: { A: "由法律規定", B: "由行政長官臨時行政命令規定", C: "由立法會依法規定", D: "由全國人大常委會決定" }, answer: "A", explanation: "區域組織的職權和產生辦法由法律規定。" },
+      { id: 99, article: 99, type: "single", question: "根據《香港基本法》第九十九條，香港特區政府任用公務人員的基本要求是甚麼？", options: { A: "必須為香港特別行政區永久性居民中的中國公民", B: "必須具備碩士以上學歷", C: "必須加入指定政黨", D: "無任何國籍限制" }, answer: "A", explanation: "在香港特別行政區政府各部門任職的公務人員，必須是香港特別行政區永久性居民。" },
+      { id: 100, article: 100, type: "multiple", question: "根據《香港基本法》第一百條，香港原有公務人員：① 經原定條件錄用的公務人員可予留用 ② 其薪金、津貼等權益低於原有標準 ③ 退休金依法受保障", options: { A: "僅 ①③", B: "僅 ①②", C: "僅 ②③", D: "①、②和③" }, answer: "A", explanation: "原有公務人員可予留用，其薪金、津貼、福利和退休金等不低於原有標準並受保障。" },
+      { id: 101, article: 101, type: "single", question: "根據《香港基本法》第一百零一條，香港特區政府可聘用甚麼人擔任政府部門的顧問或高級外職？", options: { A: "僅限香港永久居民", B: "英國或其他外國籍人士", C: "內地各省市公務員", D: "外國現役軍官" }, answer: "B", explanation: "香港特別行政區政府可聘用原英國或其他外國籍的人士擔任各部門的顧問..." },
+      { id: 102, article: 102, type: "multiple", question: "根據《香港基本法》第一百零二條，公務人員應當甚麼？", options: { A: "盡忠職守", B: "對香港特別行政區政府負責", C: "直接向全國人大常委會匯報工作", D: "效忠香港特別行政區" }, answer: "A", explanation: "公務人員應當盡忠職守，對香港特別行政區政府負責。" },
+      { id: 103, article: 103, type: "single", question: "根據《香港基本法》第一百零三條，公務人員的任用和條件，不得受甚麼影響？", options: { A: "其過去的任職背景或政治立場", B: "其專業資歷", C: "其工作表現", D: "其品格審查" }, answer: "A", explanation: "公務人員的任用和條件，不得因原有的背景而受不利影響。" },
+      { id: 104, article: 104, type: "multiple", question: "根據《香港基本法》第一百零四條，香港特區主要官員、行政會議成員、立法會議員、法官等在就職時必須依法宣誓甚麼？", options: { A: "效忠中華人民共和國香港特別行政區", B: "擁護《中華人民共和國香港特別行政區基本法》", C: "效忠英聯邦元首", D: "宣誓效忠香港特別行政區" }, answer: "A", explanation: "必須依法宣誓效忠中華人民共和國香港特別行政區和擁護基本法。" },
+      { id: 105, article: 105, type: "single", question: "根據《香港基本法》第一百零五條，香港特區依法保護私人和法人財產甚麼權利？", options: { A: "徵收與沒收權", B: "取得、使用、轉讓和繼承權", C: "無條件劃撥權", D: "國有化調整權" }, answer: "B", explanation: "依法保護私人和法人財產的取得、使用、轉讓和繼承的權利..." },
+      { id: 106, article: 106, type: "multiple", question: "根據《香港基本法》第一百零六條，香港特區的財政收入：① 全部交由中央人民政府統一調配 ② 由香港特區使用 ③ 不上繳中央人民政府", options: { A: "僅 ①②", B: "僅 ②③", C: "僅 ①③", D: "①、②和③" }, answer: "B", explanation: "香港特別行政區的財政收入全部留歸香港特區使用，不上繳中央人民政府。" },
+      { id: 107, article: 107, type: "single", question: "根據《香港基本法》第一百零七條，香港特區的財政預算以甚麼原則為指導？", options: { A: "量入為出", B: "全面赤字刺激經濟", C: "中央財政補貼平衡", D: "無限信貸擴張" }, answer: "A", explanation: "香港特別行政區的財政預算以量入為出為原則..." },
+      { id: 108, article: 108, type: "multiple", question: "根據《香港基本法》第一百零八條，關於香港特區的稅收制度：① 實行獨立的稅收法律制度 ② 自行制定稅收種類、稅率 ③ 稅法統一由國家財政部頒布", options: { A: "僅 ①②", B: "僅 ①③", C: "僅 ②③", D: "①、②和③" }, answer: "A", explanation: "香港特區參照原有的低稅政策自行立法實行獨立的稅收制度。" },
+      { id: 109, article: 109, type: "single", question: "根據《香港基本法》第一百零九條，香港特區政府應當提供甚麼環境，以維持香港的國際金融中心地位？", options: { A: "適當的法律和經濟環境", B: "高額的財政補貼政策", C: "中央無息貸款支持", D: "嚴格的外匯管制" }, answer: "A", explanation: "香港特區政府提供適當的經濟和法律環境，維持國際金融中心地位。" },
+      { id: 110, article: 110, type: "multiple", question: "根據《香港基本法》第一百一十條，香港特區的貨幣金融政策：① 自行制定 ② 保障金融企業自由經營 ③ 由中國人民銀行直接管理貨幣發行", options: { A: "僅 ①②", B: "僅 ①③", C: "僅 ②③", D: "①、②和③" }, answer: "A", explanation: "香港特區自行制定貨幣金融政策，保障金融企業和金融市場自由經營。" },
+      { id: 111, article: 111, type: "single", question: "根據《香港基本法》第一百一十一條，香港特區的法定貨幣是甚麼？", options: { A: "人民幣", B: "港元", C: "美元", D: "英鎊" }, answer: "B", explanation: "香港特區的法定貨幣是港元。" },
+      { id: 112, article: 112, type: "multiple", question: "根據《香港基本法》第一百一十二條，關於外匯與資金流動：① 不實行外匯管制制度 ② 資金流動自由 ③ 資金出入須經中央審批", options: { A: "僅 ①②", B: "僅 ①③", C: "僅 ②③", D: "①、②和③" }, answer: "A", explanation: "香港不實行外匯管制政策，外匯、黃金、證券、期貨等資金流動自由。" },
+      { id: 113, article: 113, type: "single", question: "根據《香港基本法》第一百一十三條，香港特區的外匯基金由誰管理和控制？", options: { A: "中央人民政府財政部", B: "香港特區政府", C: "國際貨幣基金組織", D: "香港大型商業銀行聯合會" }, answer: "B", explanation: "香港特區的外匯基金，由香港特區政府管理和控制。" },
+      { id: 114, article: 114, type: "multiple", question: "根據《香港基本法》第一百一十四條，香港特區應當維持甚麼政策？", options: { A: "自由港政策", B: "高關稅保護政策", C: "內地一體化貿易政策", D: "嚴格配額限制政策" }, answer: "A", explanation: "香港特區應當維持自由港和保障貨物、無形財產及資本進出的自由。" },
+      { id: 115, article: 115, type: "single", question: "根據《香港基本法》第一百一十五條，香港特區實行甚麼政策，依法禁止實行關稅和類似減免歧視措施？", options: { A: "全面保護主義", B: "自由貿易政策", C: "公有制統購統銷", D: "計劃經濟政策" }, answer: "B", explanation: "香港特別行政區實行自由貿易政策..." },
+      { id: 116, article: 116, type: "multiple", question: "根據《香港基本法》第一百一十六條，香港特區為甚麼性質的單獨關稅地區？", options: { A: "單獨關稅地區", B: "可單獨參與國際貿易組織", C: "從屬內地海關總署的分支", D: "無獨立對外簽署權" }, answer: "A", explanation: "香港特別行政區為單獨的關稅地區。並可使用「中國香港」的名義參加國際組織和貿易協定。" },
+      { id: 117, article: 117, type: "single", question: "根據《香港基本法》第一百一十七條，香港特區發出的原產地證書由誰簽發？", options: { A: "香港特區政府或其指定機構", B: "商務部駐港特派員", C: "世界貿易組織秘書處", D: "內地各省市海關" }, answer: "A", explanation: "香港特區發出的原產地證書，可依照其慣例簽發。" },
+      { id: 118, article: 118, type: "multiple", question: "根據《香港基本法》第一百一十八條，香港特區政府應當提供甚麼政策和法律環境？", options: { A: "鼓勵經濟發展", B: "保障自由競爭", C: "指定行業壟斷經營", D: "取消所有市場監管" }, answer: "A", explanation: "香港特區政府應當提供政策和法律環境，鼓勵經濟發展和促進自由競爭。" },
+      { id: 119, article: 119, type: "single", question: "根據《香港基本法》第一百一十九條，香港特區政府應當自行制定政策扶持的行業不包括下列哪一項？", options: { A: "房地產與金融高利貸", B: "旅遊業與房地產業", C: "製造業與高新科技", D: "物流及專業服務" }, answer: "A", explanation: "條文明確提及鼓勵旅遊、製造業、高新科技、房地產業等（條文針對促進各行業如金融、貿易、物流、旅遊等）。" },
+      { id: 120, article: 120, type: "multiple", question: "根據《香港基本法》第一百二十條，關於香港原有地契和租約的處理：① 原有批出的土地契約繼續予以承認和保護 ② 租期可延至一九九七年六月三十日以後 ③ 須全部向內地國土部門重新補辦登記並繳交巨額地價", options: { A: "僅 ①②", B: "僅 ①③", C: "僅 ②③", D: "①、②和③" }, answer: "A", explanation: "原有批出的土地契約繼續予以承認和保護，租期可延至一九九七年六月三十日以後而不另收地價。" }
+    ];
+
+    async function importData() {
+      const statusEl = document.getElementById('status');
+      const progressBar = document.getElementById('progress-bar');
+      const total = questions.length;
+      
+      try {
+        for (let i = 0; i < total; i++) {
+          let q = questions[i];
+          statusEl.innerText = `正在寫入第 ${i + 1} / ${total} 筆資料 (q_${q.id})...`;
+          
+          await setDoc(doc(db, "questions_bl", `q_${q.id}`), q);
+          
+          let percent = ((i + 1) / total) * 100;
+          progressBar.style.width = percent + "%";
+        }
+        statusEl.innerText = "全部寫入成功！第 81-120 條已順利更新至 Firestore。";
+        progressBar.style.background = "#2196F3";
+      } catch (error) {
+        console.error("寫入錯誤：", error);
+        statusEl.innerText = "寫入失敗：" + error.message;
+        progressBar.style.background = "#f44336";
+      }
+    }
+    
+    importData();
+  </script>
+</body>
+</html>
